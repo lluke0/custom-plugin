@@ -4,12 +4,17 @@
 
 ```
 StudyVault/
-  00-Dashboard/          # MOC + Quick Reference + Exam Traps
-  01-<Topic1>/           # Concept notes per domain
-  02-<Topic2>/
+  _assets/<source-stem>/p-001.png ...    # full-page PNG renders from pdftoppm
+  00-Dashboard/                          # MOC + Quick Reference + Exam Traps
+  01-<Chapter1>/                         # Concept notes per source chapter/section
+    <section>.md
+  02-<Chapter2>/
   ...
-  NN-문제풀이/ (or Practice/)
+  concepts/<area>.md                     # per-area trackers (for quiz/lesson)
+  dashboard.md                           # learning progress (canonical English filename)
 ```
+
+Folder structure mirrors the source's chapter/section layout. Do not re-cluster across chapter boundaries.
 
 ## Learning Dashboard Template (`StudyVault/dashboard.md`)
 
@@ -48,7 +53,7 @@ All areas start at ⬜ Undersampled / 0 Mastery. `quiz` fills as quizzes happen.
 
 ## Concept Tracker Template (`concepts/{area}.md`)
 
-One per area. Built with seed populated from Phase D2 (NOT just file count). Tracker starts empty.
+One per area. Built with seed populated from the concept notes in `NN-<area>/*.md` (NOT just file count). Tracker starts empty.
 
 ```markdown
 # {Area Name} — Concept Tracker
@@ -68,7 +73,7 @@ One per area. Built with seed populated from Phase D2 (NOT just file count). Tra
 (added as concepts are missed)
 ```
 
-- **Seed block**: MANDATORY. **Section-level granularity** — for each concept note in the area, emit one seed per `##` heading inside that file (excluding `Overview Table`, `Exam/Test Patterns` / `시험 빈출 패턴`, `Related Notes` / `Related Concepts` / `관련 노트`). One `.md` file → multiple seed entries. Practice files excluded. Label format: `<file-basename> · <section-title>` (or `<section-title>` alone if globally unique within the area). Authoritative total for Coverage.
+- **Seed block**: MANDATORY. **Section-level granularity** — for each concept note in the area, emit one seed per `##` heading inside that file (excluding `Related Notes` / `Related Concepts` / `관련 노트`). One `.md` file → multiple seed entries. Label format: `<file-basename> · <section-title>` (or `<section-title>` alone if globally unique within the area). Authoritative total for Coverage.
 - **Tracker**: starts empty; `quiz` adds rows on first test, `lesson` adds rows on first explanation (Status = `📘`). Column order fixed. Status enum: `📘` learned (lesson-only) / `🔴` unresolved / `🟡` tentative or stale / `🟢` confirmed. See [../../quiz/references/progress-rules.md §1, §4](../../quiz/references/progress-rules.md).
 - **Error Notes**: header from creation; entries never deleted.
 
@@ -90,18 +95,13 @@ keywords: MOC, study map, dashboard, <subject>
 ## Topic Map
 | Section | Source | Notes | Status |
 |---------|--------|-------|--------|
-| Topic 1 | Part 1 | [Note 1](../01-Topic1/note-1.md), [Note 2](../01-Topic1/note-2.md) | [ ] |
-
-## Practice Notes
-| 문제셋 | 문항 수 | 링크 |
-|--------|---------|------|
-| Topic 1 | N문제 | [Topic 1 Practice](../01-Topic1/practice.md) |
+| Topic 1 | Part 1, p.10-25 | [Note 1](../01-Topic1/note-1.md), [Note 2](../01-Topic1/note-2.md) | [ ] |
 
 ## Study Tools
 | 도구 | 설명 | 링크 |
 |------|------|------|
-| Exam Traps | 시험 함정/오답 포인트 모음 | [Exam Traps](exam-traps.md) |
-| Quick Reference | 전체 치트시트 | [빠른 참조](quick-reference.md) |
+| Exam Traps | 원문에서 직접 인용한 주의/경고 콜아웃 모음 | [Exam Traps](exam-traps.md) |
+| Quick Reference | 원문 정의·공식 인용 모음 | [빠른 참조](quick-reference.md) |
 
 ## Keyword Index
 | Keyword | 관련 주제 | 규칙 |
@@ -111,7 +111,7 @@ keywords: MOC, study map, dashboard, <subject>
 > **Note:** <1-line summary of keyword hierarchy rule>
 
 ## Weak Areas
-- [ ] Area needing review → [Relevant Note](../01-Topic1/relevant.md) → [Exam Traps](exam-traps.md)
+- (Empty initially. `quiz` populates as concepts are missed.)
 
 ## Non-core Topic Policy
 | Source | Content | Handling |
@@ -121,31 +121,53 @@ keywords: MOC, study map, dashboard, <subject>
 
 ## Quick Reference Template
 
-- Every section heading MUST include `→ [Concept Note](relative/path.md)` link.
-- One-line summary table per concept/term, grouped by category.
-- All key formulas + condition expressions.
-- "Must-know formulas/patterns" section at bottom with `→ [Note](relative/path.md)` links.
-
-## Exam Traps Template
+> Verbatim quotes only. If the source has no clean definition or formula for an entry, **omit it** — do NOT compose one.
 
 ```markdown
 ---
-keywords: exam traps, weak areas, common mistakes, dashboard
+keywords: quick reference, definitions, formulas, dashboard
+---
+
+# Quick Reference (빠른 참조)
+
+> 원문에서 직접 인용한 정의·공식 모음. 모든 항목은 출처 페이지를 표기합니다.
+
+## <Topic 1> → [Concept Note](../01-Topic1/concept.md)
+
+**Term A**
+> 원문 (p.12): "exact source text defining Term A"
+
+**Term B**
+> 원문 (p.14): "exact source text defining Term B"
+
+## 핵심 공식
+
+**Formula X (p.20)**
+> 원문 (p.20): "f(x) = ..."  
+> → [관련 노트](../01-Topic1/concept.md)
+```
+
+## Exam Traps Template
+
+> Quotes ONLY of source's own warning/note/caution callouts (e.g., "주의:", "Warning:", "주목:", "흔한 오류"). Do NOT generate trap commentary.
+
+```markdown
+---
+keywords: exam traps, warnings, source callouts, dashboard
 ---
 
 # Exam Traps (시험 함정 포인트)
 
-> **Warning:** 시험에서 자주 틀리거나 헷갈리는 포인트만 모은 **오답/함정 노트**입니다.
+> **Note:** 원문에 명시된 주의/경고 콜아웃만 인용합니다. 원문에 그런 콜아웃이 없는 주제는 이 파일에 포함되지 않습니다.
 
 ## <Topic 1>
 
 <details>
-<summary>Trap: &lt;Short description&gt;</summary>
+<summary>주의 (p.23)</summary>
 
-- <What the trap is>
-- <Why it's confusing>
-- <The correct answer/approach>
-- [Related Concept Note](../01-Topic1/concept.md)
+> 원문 (p.23): "exact warning text from source"
+
+→ [Related Concept Note](../01-Topic1/concept.md)
 
 </details>
 
@@ -156,191 +178,90 @@ keywords: exam traps, weak areas, common mistakes, dashboard
 - [빠른 참조](quick-reference.md)
 ```
 
-## Concept Note Template — Textbook-Level Depth
+If the source has no warning/caution callouts at all, the file body contains a single line: `> 원문에 명시된 주의/경고 콜아웃이 발견되지 않았습니다.`
 
-Goal: **the note alone is sufficient to learn the topic without the source PDF**. Section headings inside generated notes should be localized to the source language (e.g. Korean source → `### 정의`, `### 원리`); the English headings below are the canonical labels.
+## Concept Note Template — Source Fidelity
+
+> Goal: every body line is either (a) a verbatim quote with page citation, or (b) a captured visual from source. The LLM contributes ONLY: section titles, ≤1-line navigation lead-ins, visual embeds, and `## Related Notes`. Section headings inside generated notes should be localized to the source language (e.g. Korean source → `### 정의`, `### 원리`).
 
 ```markdown
 ---
-source_pdf: <filename.pdf — MUST match verified Phase 1 mapping>
+source_pdf: <filename.pdf — MUST match verified Phase D1 mapping>
 part: <part number>
 keywords: <3-5 English keywords>, <tag-from-registry>
 ---
 
-# <Title> (<Importance: ★~★★★>)
+# <Title> (p.<page-range>)
 
-## Overview Table (한눈에 비교)
-| Item | Key Point |
-|------|-----------|
-| A    | ...       |
+## <Section title from source — e.g. 정의>
 
-## <Concept 1> [definition|mechanism|process|tradeoff|formula|structure|classification]
+> 원문 (p.12): "exact verbatim quote from the source. Multi-line quotes
+> continue with leading `> ` markers and preserve original wording.
+> Hyphenated line breaks are re-joined; footnote markers may be dropped.
+> Word order, terminology, and notation MUST NOT be changed."
 
-### Definition (정의)
-One-sentence definition + 1-2 lines on why it matters (2-4 lines total).
+> 원문 (p.13): "subsequent quote on the next page if the section spans
+> multiple pages. Each block carries its own page citation."
 
-### Intuition / Analogy (직관·비유)  ← MANDATORY
-2-5 lines that answer "왜 이게 이렇게 생겼는가?" before any formalism. Use a real-world analogy, a degenerate case ("if N=1 …"), or a "before/after this concept existed" framing. The reader should feel the *shape* of the idea here, not memorize a definition.
+![<verbatim caption from source> (p.13, 그림 2.4)](../_assets/<source-stem>/p-013.png)
 
-### Principle / Derivation / Mechanism (원리)
-No length limit. Explain the "why" thoroughly so the learner truly understands.
-- Causal relationships, mechanisms, formula derivations
-- Tables compress facts, prose explains causality/principle (split roles)
-- **bold** for critical terms
+## <Section title from source — e.g. 원리>
 
-### Visualization (recommended — for mechanism / process / tradeoff / structure types)
-Prefer mermaid; fall back to ASCII when mermaid struggles; omit if neither helps.
+> 원문 (p.14-15): "..."
 
-​```mermaid
-flowchart LR
-  A[Input] --> B{Decision}
-  B -->|yes| C[Path 1]
-  B -->|no| D[Path 2]
-​```
-
-Or ASCII:
-
-​```
-┌─────────┐   transition   ┌─────────┐
-│ State A │ ─────────────▶ │ State B │
-└─────────┘                └─────────┘
-​```
-
-### Examples (예시 — ≥2 required)
-Provide **at least two** concrete examples with different *shape* (don't just change numbers in the same template).
-- Example 1 — Input: ... / Output: ... / Why this output: ...
-- Example 2 — A degenerate, edge, or contrasting scenario with concrete numbers/context.
-
-### Common Misconceptions (자주 오해하는 점)  ← MANDATORY
-2-4 bullets, each in the form **"X라고 생각하기 쉽지만 실제로는 Y — 이유는 Z"**. Cover at least one mix-up with a sibling concept and one wrong intuition that the formal definition does NOT rule out.
-
-### Exceptions / Edge Cases (선택)
-> **Warning:** conditions under which the generalization breaks, and what happens then.
-
-### Application / When to use (선택 — comparison/tradeoff/decision concepts에 권장)
-실제로 이 개념을 꺼내 쓰는 상황 + 비슷한 개념 대신 이걸 골라야 하는 신호.
+![표 2.1 — <verbatim caption> (p.15)](../_assets/<source-stem>/p-015.png)
 
 ---
 
-## Exam/Test Patterns (시험 빈출 패턴)
-| Scenario/Keyword | Answer |
-|-------------------|--------|
-| "keyword X" | **Solution Y** |
-
 ## Related Notes  ← role-labeled (MANDATORY)
-- **선수 개념 (prerequisite)**: [Concept A](../01-Topic/a.md) — why it must come first
-- **관련 개념 (sibling)**: [Concept B](b.md) — how they differ
-- **이 개념을 쓰는 곳 (downstream)**: [Concept C](../03-Topic/c.md) — what builds on this
+- **선수 개념 (prerequisite)**: [Concept A](../01-Topic/a.md) — referenced on p.10 as background
+- **관련 개념 (sibling)**: [Concept B](b.md) — covered in adjacent section
+- **이 개념을 쓰는 곳 (downstream)**: [Concept C](../03-Topic/c.md) — applied in later chapter
 ```
 
 ### Concept Note Rules
 
-- **Links**: relative-path markdown `[text](path.md)`.
-- **Callouts**: `> **Tip:**` (helpful) / `> **Important:**` (must-know) / `> **Warning:**` (pitfall).
-- **Density floor (MANDATORY)**: every concept MUST contain Definition, Intuition/Analogy, Principle/Mechanism, ≥2 Examples, and Common Misconceptions sections. Skip ONLY if genuinely inapplicable; state the reason inline.
-- **Dynamic sectioning**: extra sections (Visualization, Exceptions, Application, Comparison) are chosen by concept type — do NOT add empty headings to satisfy a template, and do NOT omit the 5 mandatory sections to keep things short.
-- **Depth-by-type**: body length is determined by content type. Definitions stay short; mechanism / process / derivation types get as much room as needed. **No line-count limit.** As a calibration: if your note for a non-trivial mechanism concept is under ~40 lines of body (excluding frontmatter, headings, links), it is almost certainly under-spec.
-- **Format**: facts in tables, causality/principle in prose, visual patterns in diagrams — split by role.
-- **Visualization (recommended)**: for mechanism / process / tradeoff / structure types, prefer visualization. mermaid first, ASCII fallback. Not required, but include whenever it helps. See §Visualization Guide.
-- **Examples ≥2**: each example must have a *different shape* (not just different numbers in the same template). Concrete input/output, numbers, or scenario.
-- **Misconceptions ≥2**: each in "X로 보이지만 실은 Y — 이유 Z" form; at least one mix-up with a sibling concept.
-- **Related Notes role-labeled**: prerequisite / sibling / downstream — labeled, not a flat list.
-- **Simplification-with-exceptions**: general statements must note edge cases (`> **Warning:**` or link to exception).
-- **Self-test**: ask "can I solve an analysis-type quiz item from this note alone, AND could I explain this to someone who only knows the prerequisites?" — if not, expand.
+- **Body composition**: every line of body content is one of:
+  1. A `> 원문 (p.N): "..."` blockquote (verbatim source text).
+  2. A visual embed `![caption (p.N)](../_assets/<source-stem>/p-NNN.png)`.
+  3. A section heading (`##` for lesson-step-level sections, `###` for sub-blocks within a step) reflecting the source's own structure. **Use `##` for the primary section divisions** — this is what `lesson` parses as teachable steps and what `concepts/{area}.md` seed block counts.
+  4. A ≤1-line navigation lead-in (optional, for orienting the reader to which source pages this section covers).
+  5. The trailing `## Related Notes` block.
+- **No LLM-composed prose** anywhere outside (3), (4), and the `Related Notes` link descriptions. No mermaid, no ASCII diagrams, no tables that aren't direct reproductions of source tables (and source tables prefer the page-render image).
+- **Verbatim with minimal typographic cleanup**: re-flow paragraph-end line breaks, re-join broken hyphens, drop footnote markers. Word/order/notation changes are FORBIDDEN.
+- **Cuts and clarifications**: ellipsis `[…]` for cuts; `[원문 표기 그대로: ...]` for ambiguous symbols only. Never silently rewrite.
+- **Page citation**: every `> ` quote MUST end with `(p.N)` or `(p.N-M)`. Single-page quotes get one number; quotes spanning pages get a range.
+- **Visual embeds**: every figure/table/equation on a page covered by the note MUST be embedded. Page-level capture (full PNG render) is the default. Caption text is verbatim from source.
+- **Frontmatter**: `source_pdf`, `part`, `keywords` all required. `source_pdf` MUST match Phase D1 mapping.
+- **Empty is acceptable**: if the source covers a topic in one sentence, the note is one quote line. Do NOT pad.
+- **Self-test**: every body line traces back to a specific source page. If you can't point at the page, the line should not exist.
 
-## Visualization Guide
+## Visual Capture Guide
 
-For mechanism / process / tradeoff / structure concepts, visualization is recommended. **Not strictly required**, but if tables and prose do not convey meaning clearly, try a diagram first.
+For PDF sources, all visual content is captured directly from the source — **no LLM-generated diagrams**.
 
-### Mermaid first, ASCII fallback
+### Capture pipeline (Phase D1)
 
-- **Default to mermaid** — renders in GitHub / VS Code / mdBook / `tutor view`.
-- **Use ASCII** when mermaid is awkward (memory layouts, bit fields, coordinate plots) or when inline emphasis is needed.
-- **If neither fits**, fall back to tables and prose — do not force a diagram.
-
-### Tool matrix
-
-| Content type | 1st choice (mermaid) | 2nd choice (ASCII) |
-|---|---|---|
-| State transitions / decision branches | `stateDiagram-v2` / `flowchart` | boxes + arrows |
-| Time order / steps | `sequenceDiagram` | timeline |
-| Hierarchy / taxonomy | `graph TD` | tree (`├─ └─`) |
-| Data flow (DAG) | `flowchart LR` | box chain |
-| Memory / packet / bit layout | — | ASCII box (required) |
-| Comparison / tradeoffs | (prefer table) | (prefer table) |
-| Algorithm pseudocode | — | fenced code block |
-| Graph / coordinates | `xychart-beta` | ASCII plot |
-
-### ASCII diagram rules
-
-- Box characters: `┌ ┐ └ ┘ │ ─ ├ ┤ ┬ ┴ ┼` (Unicode box-drawing).
-- Arrows: `→ ← ↑ ↓ ↔` or `-->` `<--`.
-- Uniform box widths; align horizontal arrow lines.
-- **Width ≤ 80 characters.**
-
-### Mermaid authoring rules
-
-- Fence: ` ```mermaid ` … ` ``` ` (do not confuse with other code fences).
-- Node IDs in ASCII alphanumerics; labels may contain non-ASCII (e.g. `A[입력 데이터]`).
-- Keep ≤ 12 nodes per diagram — split if larger.
-- No color dependence — distinguish meaning by label/shape so it survives monochrome rendering.
-
-## Practice Question Template
-
-```markdown
----
-source_pdf: <filename.pdf — MUST match verified Phase 1 mapping>
-part: <part number>
-keywords: practice, <topic keywords>, <topic-tag>
----
-
-# <Topic> Practice (N questions)
-
-## Related Concepts
-- [Concept Note 1](concept-note-1.md)
-
-<details>
-<summary>핵심 패턴 (클릭하여 보기)</summary>
-
-| Keyword | Answer |
-|---------|--------|
-| pattern 1 | **Solution** |
-
-</details>
-
----
-
-## Question 1 - <Short Label> [recall]
-> Scenario summary in one line
-
-<details>
-<summary>정답 보기</summary>
-
-Answer text here with explanation.
-
-</details>
-
----
-
-(Repeat with `[application]` and `[analysis]` tagged questions for diversity.)
-
----
-
-<details>
-<summary>패턴 요약 (클릭하여 보기)</summary>
-
-| Keyword | Answer |
-|---------|--------|
-| ... | ... |
-
-</details>
+```bash
+mkdir -p "StudyVault/_assets/<source-stem>"
+pdftoppm -r 150 -png "source.pdf" "StudyVault/_assets/<source-stem>/p"
+pdfimages -list "source.pdf" > "/tmp/<source-stem>_images.tsv"
 ```
 
-### Practice Question Rules
+- **`pdftoppm -r 150 -png`** renders every page as a PNG. Default 150dpi; bump to 200–300 for pages with small text or fine diagrams. Output filenames are `p-001.png`, `p-002.png`, ...
+- **`pdfimages -list`** produces a per-page inventory of raster images. Use it to identify which pages contain figures/tables/equations that MUST be embedded in their concept notes.
+- For typeset equations and complex tables, the page render is authoritative — do NOT attempt to retype them as LaTeX or markdown unless the source provides them as plain text (e.g., inline `f(x) = x²`).
 
-- Every topic folder MUST have a practice file (8+ questions).
-- **Answer hiding**: ALL answers wrapped in `<details><summary>정답 보기</summary>…</details>`.
-- **Patterns**: `<details><summary>핵심 패턴 (클릭하여 보기)</summary>` (top) and `<details><summary>패턴 요약 (클릭하여 보기)</summary>` (bottom).
-- **Type diversity** (tag in heading: `[recall]` / `[application]` / `[analysis]`): ≥60% recall, ≥20% application, ≥2 analysis per file.
-- Scenario in one `>` blockquote; answer 1-3 lines inside `<details>`.
-- `## Related Concepts` with relative-path links (MANDATORY).
+### Embedding rules
+
+- **Path**: relative, `../_assets/<source-stem>/p-NNN.png`.
+- **Caption**: verbatim source caption (e.g., `Fig 3.5 — 메모리 계층 구조`). Include page number: `(p.23)`.
+- **Granularity**: page-level by default. If a single page contains multiple unrelated figures, embed once and let the reader visually locate the relevant one. Cropped versions can be added manually post-generation if needed.
+- **Multi-page figures**: embed each page involved.
+- **Non-PDF sources** (web pages, plain text): no automatic capture; if the source has images, follow the source's own image references where possible. Otherwise, the note is text-quote only.
+
+### What NOT to do
+
+- Do NOT generate mermaid or ASCII diagrams in `setup` output. Visualization is the source's responsibility — captured as-is or omitted.
+- Do NOT re-typeset equations from `pdftotext` output (it mangles them). Always embed the page render for equation-heavy pages.
+- Do NOT crop pages programmatically without verification — over-aggressive cropping cuts captions.

@@ -61,9 +61,9 @@ Verify every item after sync phases complete. Fix and re-verify until all pass.
 ## 9. Content Quality (inherited)
 
 Apply [../../setup/references/quality-checklist.md](../../setup/references/quality-checklist.md) to **new and regenerated** notes only:
-- [ ] Concept notes: Overview Table, Exam/Test Patterns, Related Notes.
-- [ ] Practice: 8+ questions, `<details>` wrapping, type diversity.
-- [ ] ASCII diagrams for process/flow topics; Equal Depth Rule observed.
+- [ ] Concept notes: verbatim `> 원문 (p.N): ...` quotes only, no LLM-composed prose, role-labeled `## Related Notes`.
+- [ ] Visual capture: `_assets/<source-stem>/` page renders exist; figures/tables/equations on covered pages are embedded.
+- [ ] Source-bounded scope observed (no invented topics, no expansion beyond what the source covers).
 
 ## 10. Reporting
 

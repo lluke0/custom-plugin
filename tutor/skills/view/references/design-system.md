@@ -54,7 +54,7 @@ Never animate opacity on text (causes sub-pixel jitter). Always animate transfor
 
 ## `<details>` block styling
 
-Distinct from other surfaces — this is the one interactive primitive used heavily in practice questions:
+Distinct from other surfaces — used for foldable callouts (e.g., `Exam Traps` quotes from source warnings):
 
 - Gradient border: soft ink tint when closed, accent tint with shadow when open
 - Summary: custom `▸` marker rotating to `▾` on open (no default browser marker)

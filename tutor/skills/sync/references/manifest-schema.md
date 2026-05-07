@@ -143,7 +143,7 @@ Typical manifest size: ~1-5 KB per source entry. For 100 sources, manifest is ~1
       "notes": [
         "02-cpu/pipeline.md",
         "02-cpu/hazard.md",
-        "02-cpu/practice.md"
+        "02-cpu/forwarding.md"
       ]
     },
     "notes/raft.md": {

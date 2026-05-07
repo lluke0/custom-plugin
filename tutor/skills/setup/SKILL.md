@@ -1,15 +1,17 @@
 ---
 name: setup
 description: >
-  Transforms knowledge sources (PDF/text/web) into a portable markdown StudyVault with structured notes,
-  dashboards, and practice questions for active recall.
+  Builds a portable markdown StudyVault from source PDFs/text/web by quoting source prose verbatim
+  with page citations and embedding all source visuals (figures, tables, equations) as captured PNGs.
 argument-hint: "[source-path-or-url] | --enrich"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch
 ---
 
-# Tutor Setup — Knowledge to Markdown StudyVault
+# Tutor Setup — Source-Fidelity StudyVault
 
-Generates a **textbook-grade** plain-markdown study vault that renders in any markdown viewer (GitHub, VS Code, mdBook). The goal: notes alone are sufficient for full learning — no need to consult the source PDF. No Obsidian or proprietary tools required.
+Generates a **structured reader's edition** of the source: every body line is either a verbatim quote with page citation or a captured PDF visual. The LLM organizes, captures, and cross-links — it does NOT compose body content. The vault renders in any markdown viewer (GitHub, VS Code, mdBook).
+
+> **Core principle (READ FIRST)**: every word of body content MUST come from the source — either as a verbatim text quote (`> 원문 (p.N): "..."`) or as a captured PDF image. If something is not in the source, it does NOT belong in the vault. The LLM contributes structure (folders, headings, frontmatter), navigation (cross-links, dashboards), and metadata (keywords) — nothing else.
 
 > **CWD Boundary**: see [../_shared/cwd-boundary.md](../_shared/cwd-boundary.md).
 > **Portability Rules**: see [../_shared/portability-rules.md](../_shared/portability-rules.md). All generated notes MUST follow these.
@@ -22,110 +24,124 @@ Generates a **textbook-grade** plain-markdown study vault that renders in any ma
 
 1. **Auto-scan CWD** for `**/*.{pdf,txt,md,html,epub}` (exclude `node_modules/`, `.git/`, `dist/`, `build/`, `StudyVault/`). Present for user confirmation.
 2. **Extract text (MANDATORY tools)**:
-   - **PDF → `pdftotext` CLI ONLY** via Bash — NEVER use Read directly on PDFs (renders pages as images, wastes 10-50× tokens). Convert to `.txt` first, then Read the `.txt`.
+   - **PDF → `pdftotext` CLI ONLY** via Bash — NEVER use Read directly on PDFs.
      ```bash
-     pdftotext "source.pdf" "/tmp/source.txt"
+     pdftotext -layout "source.pdf" "/tmp/source.txt"
      ```
      Install if missing: `brew install poppler` (macOS) / `apt-get install poppler-utils` (Linux).
    - URL → WebFetch. Other formats (`.md`, `.txt`, `.html`) → Read directly.
-3. **Read extracted `.txt` files** — work exclusively from converted text, never raw PDF.
-4. **Source Content Mapping (MANDATORY for multi-file sources)**:
+3. **Capture visual assets (MANDATORY for PDF sources)**:
+   - **Render every page as PNG** to `StudyVault/_assets/<source-stem>/`:
+     ```bash
+     mkdir -p "StudyVault/_assets/<source-stem>"
+     pdftoppm -r 150 -png "source.pdf" "StudyVault/_assets/<source-stem>/p"
+     ```
+     `pdftoppm` produces `p-001.png`, `p-002.png`, ... Notes embed pages by relative path.
+   - **Inventory raster figures per page** to know which pages MUST be embedded:
+     ```bash
+     pdfimages -list "source.pdf" > "/tmp/<source-stem>_images.tsv"
+     ```
+   - The pdftoppm renders are the *authoritative visual record* — they capture figures, tables, and typeset equations in their original form. Re-render at higher dpi (200–300) for any page where embedded text is hard to read.
+4. **Read extracted `.txt` files** — work exclusively from converted text + page renders, never raw PDF.
+5. **Source Content Mapping (MANDATORY for multi-file sources)**:
    - Read **cover + TOC + 3+ sample pages from middle/end** for EVERY source file.
    - **NEVER assume content from filename** — file numbering often ≠ chapter numbering.
    - Build verified mapping: `{ source_file → actual_topics → page_ranges }`. Flag non-academic files and missing sources. Present for user verification before proceeding.
 
 ### Phase D2: Content Analysis
 
-1. Identify topic hierarchy — sections, chapters, domain divisions.
-2. Separate concept content vs practice questions.
-3. Map dependencies between topics.
-4. Identify key patterns — comparisons, decision trees, formulas.
-5. **Full topic checklist (MANDATORY)** — every topic/subtopic listed. Drives all subsequent phases.
+> **Source-bounded rule (replaces Equal Depth Rule)**: vault scope is bounded by what the source contains. If the source covers a subtopic in one paragraph, the corresponding note is one quoted paragraph. Do NOT expand briefly mentioned subtopics with LLM-supplied content.
 
-> **Equal Depth Rule**: Regardless of source length, **expand to the depth required for true conceptual understanding**. Even briefly mentioned subtopics must become full notes containing definition / mechanism / visualization (recommended) / example / exceptions. **No upper bound on body length** — but compress with tables and diagrams wherever possible.
-
-6. **Classification completeness**: When source enumerates categories ("3 types of X", "N가지", "categories"), every member gets a dedicated note.
-7. **Source-to-note cross-verification (MANDATORY)**: Record source file(s) + page range(s) per topic. Flag untraceable topics as "source not available".
+1. **Identify topic hierarchy from the source's own TOC/headings** — do NOT impose an external taxonomy.
+2. **Map dependencies** using only the source's own forward/backward references (e.g., "see Chapter 3", "as discussed earlier").
+3. **Topic checklist (MANDATORY)** — every section/subsection from source TOC is listed with source file + page range. This drives folder structure and concept files.
+4. **Source-to-note cross-verification (MANDATORY)** — topics without traceable source pages are NOT created (do not invent them).
 
 ### Phase D3: Keyword Standard
 
-Define keyword vocabulary before notes (stored in `keywords:` frontmatter):
+Define keyword vocabulary (stored in `keywords:` frontmatter):
 - **Format**: English, lowercase, kebab-case (e.g., `data-hazard`).
 - **Hierarchy**: top-level → domain → detail → technique → note-type.
 - **Registry**: only registered keywords allowed. Detail keywords co-attach parent domain keywords.
+- Keywords are **metadata about content**, not content — LLM-generated tags are allowed here.
 
 ### Phase D4: Vault Structure
 
-Create `StudyVault/` with numbered folders per [templates.md](references/templates.md). Group 3-5 related concepts per file.
+Create `StudyVault/` mirroring the source's chapter/section structure (do NOT re-cluster across chapter boundaries). See [templates.md](references/templates.md).
+
+```
+StudyVault/
+  _assets/<source-stem>/p-001.png ...    # full-page PNG renders
+  00-Dashboard/
+  01-<Chapter1>/
+    <section>.md
+    ...
+  concepts/<area>.md                     # per-area trackers
+  dashboard.md                           # learning progress
+```
 
 ### Phase D5: Dashboard Creation
 
-This phase creates **two distinct artifacts**. They are NOT duplicates — keep both, exactly one of each:
+Two distinct artifacts. Both draw content ONLY from source:
 
 1. **Content MOC bundle** at `StudyVault/00-Dashboard/` (a directory):
-   - `00-Dashboard/moc.md` — Topic Map + Practice Notes + Study Tools + Keyword Index (with rules) + Weak Areas (with links) + Non-core Topic Policy
-   - `00-Dashboard/quick-reference.md` — every heading includes `→ [Concept Note](relative/path.md)`; all key formulas
-   - `00-Dashboard/exam-traps.md` — per-topic trap points inside `<details>` blocks, linked to concept notes
+   - `00-Dashboard/moc.md` — Topic Map (links to every concept note) + Study Tools + Keyword Index (with rules) + Weak Areas (empty initially, with links once populated by `quiz`) + Non-core Topic Policy
+   - `00-Dashboard/quick-reference.md` — verbatim quotes of source's own definitions and formulas with page citations. Each entry: `**Term** — > "exact source text" (p.N) → [Concept Note](relative/path.md)`. If the source has no clean definition for a term, **omit it** — do NOT compose one.
+   - `00-Dashboard/exam-traps.md` — quotes ONLY of source's own warning/note/caution callouts (e.g., "주의:", "Warning:", "주목:", "흔한 오류"). If the source has no such callouts, the file states so in one line. Do NOT generate trap commentary.
 
-2. **Learning progress dashboard** — exactly ONE file at the canonical path **`StudyVault/dashboard.md`** (lowercase, English filename, no spaces). The H1 heading and all table content MUST be in the source language (e.g. `# 학습 대시보드` for Korean sources) — only the *filename* is canonical English so all sibling skills (`quiz`, `lesson`, `sync`) can find it deterministically. Create it per the "Learning Dashboard Template" in [templates.md](references/templates.md). All areas start at ⬜ Undersampled / 0 Mastery. Columns MUST be exactly `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` — matches the schema `quiz` reads. See [../quiz/references/progress-rules.md §2](../quiz/references/progress-rules.md) for the contract.
+2. **Learning progress dashboard** — exactly ONE file at the canonical path **`StudyVault/dashboard.md`** (lowercase, English filename so cross-skill globs are deterministic). The H1 and all table content MUST be in the source language (e.g. `# 학습 대시보드`). Per "Learning Dashboard Template" in [templates.md](references/templates.md). All areas start at ⬜ Undersampled / 0 Mastery. Columns MUST be exactly `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` — matches the schema `quiz` reads. Spec of record: [../quiz/references/progress-rules.md §2](../quiz/references/progress-rules.md).
 
-> **Single-file invariant (MANDATORY)**: there is exactly ONE learning-progress dashboard per vault, at `StudyVault/dashboard.md`. Do NOT also create `학습 대시보드.md`, `Learning Dashboard.md`, `00-Dashboard/dashboard.md`, or any other variant. If a legacy localized file (`*dashboard*` or `*대시보드*`) already exists at the vault root, **rename it to `dashboard.md`** instead of creating a new one.
+> **Single-file invariant (MANDATORY)**: exactly ONE learning-progress dashboard at `StudyVault/dashboard.md`. Do NOT also create `학습 대시보드.md`, `Learning Dashboard.md`, `00-Dashboard/dashboard.md`. If a legacy localized file exists at vault root, **rename to `dashboard.md`** instead of creating a new one.
 
-### Phase D6: Concept Notes — Textbook-Level Depth
+### Phase D6: Concept Notes — Source Fidelity
 
-Goal: **the note alone must be sufficient to learn the topic without the source PDF**. A reader who has never seen the source should finish the note feeling they understood not just *what* but *why* and *when* the concept applies.
+> **Goal**: every body line is either (a) a verbatim quote with page citation, or (b) a captured visual from source. The LLM contributes ONLY: section titles, ≤1-line navigation lead-ins, visual embeds, and `## Related Notes`.
 
 Per [templates.md](references/templates.md). Key rules:
-- YAML frontmatter: `source_pdf`, `part`, `keywords` (MANDATORY).
-- `source_pdf` MUST match verified Phase D1 mapping — never guess from filename. If unavailable: `source_pdf: 원문 미보유`.
-- **Depth-by-type**: body length is determined by content type — definitions stay short, mechanisms / processes / derivations get as much space as needed. **No line-count limit.**
-- **Density floor (MANDATORY)**: concept body MUST cover, at minimum, *all five* of: ① one-sentence definition, ② intuition/analogy (왜 이렇게 생겼는지 직관), ③ principle/mechanism/derivation, ④ ≥2 concrete examples with numbers or scenarios, ⑤ common misconceptions (자주 오해하는 점) — each its own subsection. Sections beyond these (visualization, exceptions, application, comparison, history) are added *as the topic demands*, not as a fixed template. Skip a required section ONLY if it is genuinely inapplicable (e.g. pure definition with no mechanism); record the reason in the `Principle` body.
-- **Dynamic sectioning**: choose extra sections based on concept type — mechanism → visualization + edge cases; comparison → tradeoff table + sibling links; formula → derivation + dimensional analysis; classification → enumeration with exemplars per class. Do NOT pad with empty headings.
-- **Connection (MANDATORY)**: every concept note MUST end with `## Related Notes` containing **prerequisite (선수)**, **sibling (관련)**, and **downstream (이 개념을 쓰는 곳)** links — labeled by role, not just a flat list. At least one link per role if any exist in the Vault.
-- **Visualization (recommended)**: for mechanism / process / tradeoff / structure types, prefer visualization. **mermaid first, ASCII as fallback** — if neither conveys meaning well, fall back to tables or prose. Not strictly required, but include whenever it helps. See [templates.md §Visualization Guide].
-- **Tables compress facts; prose explains the "why"** — split roles accordingly.
-- **Simplification-with-exceptions**: general statements must note edge cases.
-- **Self-test**: after writing, ask "can I solve an analysis-type quiz item from this note alone, AND could I explain it to someone with only the prerequisite concepts?". If not, expand the body, intuition, or examples.
 
-### Phase D6.5: Enrichment Mode (`--enrich`)
-
-Triggered when `/setup` is invoked with `--enrich` (no source argument required). Skip Phases D1–D5 and D7+ — operate ONLY on the existing `StudyVault/`.
-
-1. **Scan**: walk `StudyVault/**/*.md` excluding `00-Dashboard/`, `concepts/`, practice files, and `dashboard.md` (learning dashboard).
-2. **Score each concept note** against the Phase D6 *density floor*:
-   - Missing any of the 5 required subsections (definition / intuition / principle / ≥2 examples / misconceptions) → **under-spec**.
-   - Missing role-labeled `## Related Notes` (prerequisite/sibling/downstream) → **under-spec**.
-   - Body length below 2× the average of compliant notes in the same area, AND missing ≥1 required subsection → **under-spec**.
-3. **Report**: print the under-spec list with reasons, ask the user to confirm before rewriting.
-4. **Regenerate** each confirmed note: re-read its `source_pdf` page range (re-extract with `pdftotext` if needed), preserve YAML frontmatter and `source_pdf`/`part` exactly, rewrite body to satisfy the density floor, and add role-labeled `## Related Notes` resolved from sibling note titles.
-5. **Do NOT** touch keywords registry, MOC, dashboards, or practice files — enrichment is body-only. After completion, instruct the user to run `/setup` (no flag) for a full self-review pass if structural changes are desired.
+- **YAML frontmatter (MANDATORY)**: `source_pdf`, `part`, `keywords`. `source_pdf` MUST match verified Phase D1 mapping. If unavailable: `source_pdf: 원문 미보유` (and the note SHOULD NOT be created in the first place — the source-bounded rule forbids inventing content).
+- **Body composition**: prose is wrapped in `> 원문 (p.N): "..."` blockquotes. Multi-paragraph quotes use multi-line `> ` blocks. Page numbers MUST match the source.
+- **Verbatim with minimal typographic cleanup ALLOWED**: re-flow line breaks at paragraph end, re-join broken hyphens, drop footnote markers — *typographic only*. Word/order/notation changes FORBIDDEN.
+- **Ellipsis & bracket conventions**: cuts marked `[…]`; clarification (only for ambiguous symbols, very rare) marked `[원문 표기 그대로: ...]`. Never silently rewrite.
+- **Visual embeds (MANDATORY)**: every figure/table/equation appearing on a page covered by the note is embedded as `![<verbatim caption> (p.N)](../_assets/<source-stem>/p-NNN.png)`. Page-level capture is the default — if a page contains multiple unrelated figures, embed once and rely on the reader to locate the relevant region. Caption text is verbatim from source.
+- **Section headings**: localized to source language (Korean source → `## 정의`, `## 원리`). Use `##` for primary lesson-step sections (this is what `lesson` parses and `concepts/{area}.md` seed block counts); `###` only for sub-blocks within a step. Headings reflect the source's own structure — do NOT impose a canonical 5-section template.
+- **Related Notes (MANDATORY, role-labeled)** — every concept note ends with `## Related Notes` containing prerequisite (선수) / sibling (관련) / downstream (이 개념을 쓰는 곳). Drawn from cross-references the source itself makes. **This is the ONLY LLM-composed text allowed in the body.**
+- **No LLM body content**: no LLM-generated definitions, intuitions, examples, derivations, comparisons, mermaid/ASCII diagrams, or misconceptions. If you feel tempted to write a sentence outside a `>` blockquote (other than headings, ≤1-line lead-ins, visual embeds, Related Notes), stop — that content does not belong in the vault.
+- **Empty is acceptable**: a note for a topic the source mentions in one sentence is one quote line. Do NOT pad.
 
 Also create **per-area concept trackers** at `StudyVault/concepts/{area}.md` per "Concept Tracker Template" in [templates.md](references/templates.md):
-- **Concepts seed block** (`## Concepts (N total)`): populate at **section granularity, not file granularity**. For each concept note (`NN-<area>/*.md`) in the area, emit **one seed entry per `##` section heading inside the file** — a single `.md` file MUST yield multiple seed entries when it contains multiple `##` sections. Exclude boilerplate sections (`Overview Table`, `Exam/Test Patterns`, `Related Notes`, `Related Concepts`, `시험 빈출 패턴`, `관련 노트`). Label format: `<file-basename> · <section-title>` (or just `<section-title>` if globally unique within the area). Practice files are excluded entirely. This is the authoritative total for Coverage downstream.
+
+- **Concepts seed block** (`## Concepts (N total)`): section-level granularity — for each concept note in the area, emit one seed entry per `##` section heading inside the file (excluding `Related Notes`, `Related Concepts`, `관련 노트`). Label format: `<file-basename> · <section-title>` (or `<section-title>` alone if globally unique within the area). Authoritative total for Coverage downstream.
 - **Tracker table**: starts empty (Concept / Attempts / Correct / Streak / Last Tested / Status).
 - **Error Notes** section header: present from creation, body empty.
 
-### Phase D7: Practice Questions
+### Phase D6.5: Enrichment Mode (`--enrich`)
 
-Per [templates.md](references/templates.md). Key rules:
-- Every topic folder MUST have a practice file (8+ questions).
-- **Active recall**: answers wrapped in `<details><summary>정답 보기</summary>…</details>`.
-- Patterns wrapped in `<details><summary>핵심 패턴 (클릭하여 보기)</summary>…</details>`.
-- **Question type diversity**: ≥60% recall, ≥20% application, ≥2 analysis per file.
-- `## Related Concepts` with relative-path links.
+Triggered when `/setup` is invoked with `--enrich` (no source argument required). Skip Phases D1–D5 and D7+ — operate ONLY on existing `StudyVault/`. Strictly **fidelity-improving**:
 
-### Phase D8: Interlinking
+1. **Scan**: walk `StudyVault/**/*.md` excluding `00-Dashboard/`, `concepts/`, and `dashboard.md`.
+2. **Audit each concept note** for fidelity gaps. **Skip any `##` section whose heading carries the `[supplement]` tag** — those are lesson-generated supplements and are exempt from fidelity rules.
+   - **Non-quote body content**: lines in body that are not (a) `> ` blockquote, (b) section heading, (c) ≤1-line navigation lead-in, (d) visual embed, (e) Related Notes block — flag as **fidelity violation**.
+   - **Missing page citation**: `> ` quote without a `(p.N)` marker — **traceability gap**.
+   - **Missing visual capture**: source page covered by the note contains a figure/table/equation (per `pdfimages -list` inventory) but no embed in the note — **capture gap**.
+   - **Citation accuracy**: sample 20% of `(p.N)` citations and verify against `source_pdf`'s extracted text — flag mismatches as **citation error**.
+3. **Report**: print findings, ask user to confirm before rewriting.
+4. **Fix** confirmed gaps: re-extract source pages with `pdftotext`, re-capture missing visuals with `pdftoppm` (re-render at 200–300dpi if image quality is poor), replace LLM-generated prose with verbatim quotes from the same page (or remove the prose entirely if no source basis exists).
+5. **Do NOT** touch keywords registry, MOC, or learning dashboard.
 
-1. `## Related Notes` on every concept note.
-2. MOC links to every concept + practice note.
-3. Cross-link concept ↔ practice; siblings reference each other.
-4. Quick Reference sections → `[Concept Note](relative/path.md)` links.
-5. Weak Areas → relevant note + Exam Traps; Exam Traps → concept notes.
+### Phase D7: Interlinking
 
-### Phase D9: Self-Review (MANDATORY)
+1. `## Related Notes` on every concept note (role-labeled).
+2. MOC links to every concept note.
+3. Quick Reference entries → `[Concept Note](relative/path.md)` links.
+4. Exam Traps → concept notes (only when source's callouts reference specific topics).
+5. Siblings reference each other.
+
+### Phase D8: Self-Review (MANDATORY)
 
 Verify against [quality-checklist.md](references/quality-checklist.md). Fix and re-verify until all checks pass.
 
 ## Language
 
-- Match source language (Korean → Korean notes). Keywords: ALWAYS English (kebab-case).
+- Match source language (Korean source → Korean section titles + Korean quoted body). Quoted content is **always verbatim source language**.
+- Keywords: ALWAYS English (kebab-case).

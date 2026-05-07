@@ -115,10 +115,11 @@ For each 🆕 new source:
 
 1. Apply `setup` Phase D1 (Source Mapping) + D2 (Content Analysis) **to this source only**.
 2. Determine target folder: existing `NN-<topic>/` if keyword/topic overlap ≥ 70%; else create `NN-<new-topic>/` with next available number.
-3. Generate concept notes + practice file per `../setup/references/templates.md`.
-4. New keywords: check Keyword Index. Conflicts → ask user. Otherwise register under correct hierarchy (`../setup/SKILL.md` Phase D3).
-5. Apply Interlinking (D8): Related Notes, MOC link, Quick Reference, Exam Traps.
-6. Frontmatter MUST include `source_pdf`, `part`, `keywords` (3-5 english kebab-case).
+3. Generate concept notes per `../setup/references/templates.md` (verbatim quotes + captured visuals; no practice file).
+4. Capture page renders for the new source via `pdftoppm -r 150 -png "<source>" "StudyVault/_assets/<source-stem>/p"` and `pdfimages -list` to inventory figures.
+5. New keywords: check Keyword Index. Conflicts → ask user. Otherwise register under correct hierarchy (`../setup/SKILL.md` Phase D3).
+6. Apply Interlinking (`setup` Phase D7): Related Notes, MOC link, Quick Reference, Exam Traps.
+7. Frontmatter MUST include `source_pdf`, `part`, `keywords` (3-5 english kebab-case).
 
 ### Phase S6: 변경 파일 처리
 

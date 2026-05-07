@@ -66,6 +66,8 @@ This yields `|tracker rows| ≤ |seed entries| = N` as a hard invariant, which i
 
 If the `## Concepts (N total)` seed block is missing (older vault not yet migrated), fall back to: `area 폴더 NN-<area>/*.md 파일 수 중 Practice/practice/문제풀이/빈출 문제 제외`. Emit a one-time warning suggesting the user run `/sync` or let quiz auto-backfill.
 
+> **Deprecated (legacy vault only)**: the Practice/practice/문제풀이 exclusion exists for vaults built before `setup` removed practice files. New vaults will not contain such files; the exclusion is a no-op for them but kept for backward compatibility.
+
 ---
 
 ## 2. Dashboard Schema

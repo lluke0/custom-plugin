@@ -89,9 +89,19 @@ For each step from `resume_index` to last:
 
 #### L4.1 — Render the step
 
-Print the section heading and body to the user **as-is** (or lightly reformatted for chat readability — preserve mermaid/ASCII diagrams, tables, code blocks). Do not paraphrase away any content; this is the canonical textbook content.
+Render in two parts:
 
-If the section is long (>40 lines including diagrams), split into a 1-2 paragraph teaching narration that walks through the parts in order, ending with a recap. Always show the diagrams/tables verbatim.
+1. **Show the source content as-is** — print the section heading and body verbatim (or lightly reformatted for chat readability). Preserve `> 원문 (p.N): ...` blockquotes, captured image references, mermaid/ASCII diagrams, tables, code blocks. Never paraphrase away source quotes; they are the canonical record.
+
+2. **Add chat-only LLM elaboration** — `setup` keeps notes verbatim from the source, so most of a section's body will be `> 원문 (p.N)` blockquotes plus image embeds. After showing the source content, **always provide LLM-composed elaboration in chat**:
+   - Plain-language paraphrase of the quote (what the passage actually says, in everyday terms).
+   - Intuition/analogy (why the concept looks the way it does).
+   - At least one concrete example beyond what the source provides.
+   - Common misconceptions if any apply.
+   - This elaboration is **chat-only and ephemeral** — it does NOT get persisted to the source note. Only Q&A confirmed via L4.3a flow becomes a `[supplement]` section.
+   - Skip the elaboration ONLY if the section is already a `[supplement]` (lesson-generated, already self-contained) or its body already contains rich LLM-composed prose (legacy vault).
+
+If the section's source content is long (>40 lines including diagrams), split your narration into 1-2 paragraphs walking through the parts in order, ending with a recap. Always show the diagrams/tables verbatim.
 
 End every step render with the **understanding prompt** (`{LANG}`):
 
@@ -128,7 +138,7 @@ This is the only point where the source note is mutated. Perform in order (per [
 
 #### L4.3b — On Question
 
-1. **Answer in chat only**: explain in `{LANG}`, textbook-grade depth (per `setup`'s Equal Depth Rule). Include mermaid/ASCII diagram if it clarifies (recommended, not required).
+1. **Answer in chat only**: explain in `{LANG}` with textbook-grade depth — `setup` keeps notes verbatim from the source, so `lesson` is where the LLM contributes intuition, examples, and elaboration that the bare quotes lack. Include mermaid/ASCII diagram if it clarifies (recommended, not required).
 2. **Append to in-memory pending buffer** for the current step (do NOT touch the source note, tracker, or seed block yet):
    - Record `{question, answer, short_topic, timestamp}` so confirmation can flush all related Q&As at once.
    - The note file's mtime MUST remain unchanged until the user confirms understanding.
