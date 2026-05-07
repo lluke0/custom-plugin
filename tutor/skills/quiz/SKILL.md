@@ -161,11 +161,15 @@ Recompute all columns per [§2 Dashboard Schema](references/progress-rules.md) a
 - `Covered` = `|tracker rows| / Concepts`
 - `Accuracy` = `|🟢| / |tracker rows|`
 - `Mastery` = `|🟢| / Concepts`
-- `Level` from §3 (Coverage gate first, then Mastery tier)
+- `Level` from §3 — **all three gates must be checked**: Coverage gate, Mastery tier, AND **Unresolved gate (`unresolved == 0`)**. Any 🔴 row in the tracker forces Level to 🟨 or lower regardless of cov/mas. See §3 edge cases.
+
+**Total row Level**: Compute from aggregated cov/mas across all areas, AND apply this rule: if **any** non-⬜ area is 🟥 OR **any** tracker has unresolved ≥ 1, Total cannot exceed 🟨. Total may be 🟦 only when every non-⬜ area is 🟦.
 
 Stats: Total Concepts, Covered, Mastered (🟢), Stale (🟡), Unresolved (🔴), Weakest/Strongest Area (by Mastery, ⬜ excluded).
 
 Dashboard stays compact — no session logs, no per-question details.
+
+**Ordering invariant**: Phase 6 step 2 (dashboard recompute + write) MUST complete before emitting any final user-facing summary that references Level / Mastery / area progress. Never report "this area is now 🟦/🟩" based on partial recompute or pre-existing dashboard state — read-then-recompute first, then talk.
 
 ## Templates
 
@@ -177,3 +181,4 @@ Dashboard / Concept file / Tracker row / Error note formats: see [references/tem
 - ALWAYS read [quiz-rules.md](references/quiz-rules.md) before creating questions. Zero hints.
 - Error notes are NEVER deleted — permanent learning history.
 - All cross-file links use relative-path markdown, never wiki-links.
+- **"Mastered/마스터" 어휘 사용 규칙**: 사용자에게 보여주는 자유 텍스트(축하 멘트, 요약 문장 등)에서 "Mastered", "마스터", "정복" 같은 표현은 **해당 영역의 Level이 §3 기준 🟦 Mastered일 때만** 사용한다. 그 외에는 "정답률 향상", "이번 세션에서 N개 개선", "🟡로 승급", "🔴 N개 남음" 처럼 사실 기반 표현을 쓴다. 한 문제만 맞아도 Status가 🟢이 되었다는 이유로 area를 "마스터"라고 부르지 않는다.

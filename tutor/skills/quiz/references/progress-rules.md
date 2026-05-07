@@ -83,7 +83,7 @@ If the `## Concepts (N total)` seed block is missing (older vault not yet migrat
 |------|----------|---------|----------|---------|-------|---------|
 | 확장성 기초 | 10 | 10/10 (100%) | 10/10 (100%) | 10/10 (100%) | 🟦 Mastered | [details](concepts/확장성 기초.md) |
 | DNS         | 4  | 1/4 (25%)    | 0/1 (0%)     | 0/4 (0%)     | ⬜ Undersampled | [details](concepts/DNS.md) |
-| **Total**   | **N** | **x/N**     | **a/b**      | **c/N**      | (overall level) | |
+| **Total**   | **N** | **x/N**     | **a/b**      | **c/N**      | (overall level — see below) | |
 
 > ⬜ Undersampled · 🟥 Weak · 🟨 Fair · 🟩 Good · 🟦 Mastered
 
@@ -112,6 +112,16 @@ If the `## Concepts (N total)` seed block is missing (older vault not yet migrat
 | Level | Derived from Coverage + Mastery + unresolved count per §3 |
 
 Use "x/N (p%)" format for human readability. Display "-" for undefined ratios (e.g. `0/0`).
+
+### Total row Level (overall)
+
+Compute aggregated `cov_total = covered_total / N`, `mas_total = mastered_total / N`, `unresolved_total = sum of 🔴 across all areas`, then apply §3 thresholds with these additional caps:
+
+1. **Worst-area cap**: Total Level cannot be **higher** than the lowest area Level among non-⬜ areas. (e.g. if any area is 🟥, Total ≤ 🟥; if any area is 🟨, Total ≤ 🟨.)
+2. **Unresolved cap**: If `unresolved_total ≥ 1`, Total is at most 🟨 (same unresolved gate as §3).
+3. **All-undersampled**: If every area is ⬜, Total = ⬜.
+
+This ensures Total is a faithful reflection of the weakest signal in the vault, never a mean that smooths over weak areas.
 
 ---
 
@@ -157,12 +167,15 @@ Transition table (on each graded answer):
 | 📘 | wrong | 🔴 | 1 | 0 | 0 | add |
 | 🔴 | correct | 🟡 | +1 | +1 | 1 | keep (learning history) |
 | 🔴 | wrong | 🔴 | +1 | — | 0 | update |
-| 🟡 | correct | If Streak+1 ≥ 2 AND **not gated** → 🟢, else 🟡 | +1 | +1 | +1 | keep |
+| 🟡 | correct, **not gated** (concept NOT IN `session_wrong_set`) | 🟢 if Streak+1 ≥ 2, else 🟡 | +1 | +1 | +1 | keep |
+| 🟡 | correct, **gated** (concept IN `session_wrong_set`) | 🟡 (capped — Streak still increments but Status stays 🟡) | +1 | +1 | +1 | keep |
 | 🟡 | wrong | 🔴 | +1 | — | 0 | update |
 | 🟢 | correct | 🟢 | +1 | +1 | +1 | keep |
 | 🟢 | wrong | 🔴 | +1 | — | 0 | update |
 
 Always update `Last Tested` to today on any graded answer.
+
+> ⚠️ **MUST**: Before applying any `🟡 → correct` row, check whether the concept is in `session_wrong_set` (see "Session Wrong-Answer Gate" below). Skipping this check causes within-session re-promotion of just-missed concepts and is the most common Mastery inflation bug.
 
 **세션 내 오답 게이트 (Session Wrong-Answer Gate)**
 
