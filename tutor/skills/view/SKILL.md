@@ -13,14 +13,7 @@ Bootstraps a Vite + React viewer that renders the user's `StudyVault/` as a poli
 
 ## Execution Context (MANDATORY)
 
-**Run every step of this skill in the main Claude session — never delegate to a subagent.** Do NOT use the `Task` tool, the `Agent` tool, or any `subagent_type` (`general-purpose`, `Explore`, `codex:codex-rescue`, etc.) to execute the bootstrap, the `npm install`, or the `npm run dev` command.
-
-Reasons:
-- `npm run dev` is a **long-running foreground process**. Inside a subagent it would block the agent's bash and the user would never see the dev-server URL or HMR logs.
-- The user needs to interact with the live server (open browser, hit Ctrl-C to stop) — that interaction must happen in their main session, not inside an isolated subagent context.
-- Symlink refresh (`viewer/vault`) and dev-server lifecycle should be visible to the user as they happen, not buried inside a subagent's tool transcript.
-
-If you (the assistant) feel tempted to spawn an agent for "parallel exploration" or "background work" while running `/view`: don't. Read this file, then execute the Bootstrap block below directly via the main session's `Bash` tool.
+**모든 단계를 메인 세션에서 직접 실행한다. `Agent`/`Task` 도구나 `subagent_type`을 절대 사용하지 않는다.** `npm run dev`는 long-running foreground 프로세스라 서브에이전트 안에서는 dev-server URL·HMR 로그·Ctrl-C 종료가 사용자에게 보이지 않는다. 심볼릭 링크 갱신과 서버 라이프사이클도 메인 세션 트랜스크립트에 노출되어야 한다.
 
 ## Pre-flight
 

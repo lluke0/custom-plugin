@@ -13,7 +13,7 @@
       "name": "tutor",
       "source": "./tutor",
       "description": "Turn documents into a portable markdown StudyVault, learn step-by-step, and quiz yourself at the concept level. Bundles /setup, /lesson, /quiz, /view, /sync.",
-      "version": "0.10.1",
+      "version": "0.10.2",
       "category": "learning",
       "tags": ["study", "markdown", "lesson", "quiz", "active-recall", "viewer"]
     }
