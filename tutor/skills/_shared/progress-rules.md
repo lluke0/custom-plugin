@@ -1,4 +1,4 @@
-# Progress Rules — Coverage, Mastery, Streak, Stale
+# Progress Rules — Coverage, Mastery, Streak
 
 This is the **spec of record** for how learning progress is computed and stored. `quiz`, `setup`, and `sync` all reference this file. When the rules change, update this file first.
 
@@ -95,7 +95,6 @@ If the `## Concepts (N total)` seed block is missing (older vault not yet migrat
 - **Covered**: x / N (%)
 - **Learned (📘)**: l   ← lesson-explained, not yet quiz-tested
 - **Mastered (🟢)**: c / N (%)
-- **Stale (🟡)**: k
 - **Unresolved (🔴)**: u
 - **Weakest Area**: areas with `unresolved ≥ 1` come first (tie-break by unresolved count desc, then Mastery asc); if none have unresolved, pick lowest Mastery among non-Undersampled
 - **Strongest Area**: <area with highest Mastery>
@@ -154,8 +153,8 @@ Status values:
 |-------|------|---------|
 | 📘 | learned | Explained via `lesson` skill, **not yet quiz-tested**. Attempts/Correct/Streak all 0 |
 | 🔴 | unresolved | Currently missed; has error note |
-| 🟡 | tentative OR stale | Either one correct answer not yet confirmed (Streak = 1), or was 🟢 but >14 days without testing |
-| 🟢 | confirmed | Mastered: Streak ≥ 2 AND age ≤ 14 days |
+| 🟡 | tentative | One correct answer not yet confirmed (Streak = 1) |
+| 🟢 | confirmed | Mastered: Streak ≥ 2 |
 
 Transition table (on each graded answer):
 
@@ -194,73 +193,17 @@ not gated = (concept NOT IN session_wrong_set)
 
 즉, `🟡 + correct + Streak+1 ≥ 2` 조건이 모두 충족되어도, 해당 개념이 `session_wrong_set`에 있으면 Status는 🟡로 유지된다.
 
+**📘 ownership**: The `📘 Learned` status is set exclusively by the `lesson` skill (when the user signals understanding for a section). `quiz` only **reads** `📘` (treating it like `(new)` in §4 transitions, replacing the row in place) and never **writes** `📘`. `lesson` may upgrade missing rows to `📘` but must not overwrite existing `🔴/🟡/🟢` rows.
+
 **Error notes are never deleted** — they stay as learning history even after a concept returns to 🟢.
 
 ---
 
-## 5. Stale Detection — Age-based Transition
+## 5. Session Option Construction (Phase 2)
 
-**Trigger**: Phase 2.5 (Load Selected Scope & Lazy Sweep) in `quiz` SKILL.md, run once per quiz invocation **after** the user selects a session type. Scope is defined by the caller, not by this spec.
-
-**Scope** (per caller selection):
-
-| Session type | Sweep scope | Rationale |
-|---|---|---|
-| `drill-stale` | All `concepts/*.md` (full vault sweep) | User explicitly opted in to a stale review — pay the full-scan cost here |
-| `drill-weak` / `section <area>` / `hard` / `diagnostic` | Only `concepts/{selected-area}.md` (loaded scope) | Avoid forcing a full vault read for a 4-question drill |
-| `lesson` Phase L5 finalize | All `concepts/*.md` (dashboard recompute reads everything) | Lesson's final dashboard write is the natural place to catch other-area stale rows |
-
-**Lazy-scope tradeoff**: stale rows in unselected areas remain 🟢 until that area is next touched (by `quiz` or `lesson`). This is intentional — full sweeps on every quiz invocation would dominate I/O for small drills. Users wanting comprehensive stale catching choose `drill-stale`.
-
-**Algorithm**:
-
-```
-today = current date (YYYY-MM-DD)
-STALE_DAYS = 14
-SCOPE = caller-defined set of concepts/{area}.md files (see table above)
-
-for each concepts/{area}.md in SCOPE:
-    for each row in tracker table:
-        if Status == 🟢 and (today - parse(Last Tested)).days > STALE_DAYS:
-            Status ← 🟡
-            # Streak is NOT reset — preserved as learning history
-    if any row changed: write concepts/{area}.md
-
-# Dashboard recompute happens later (quiz Phase 6 / lesson Phase L5),
-# which reads all concepts/*.md regardless of sweep scope — so stale
-# transitions in SCOPE are reflected in the dashboard on the next write.
-
-if any row changed:
-    emit notice to user: "ℹ️ N개 개념이 복습 대기(stale)로 전환되었습니다: …"
-```
-
-**Stale exit**: When a 🟡-stale concept is answered correctly, it returns to 🟢 (Streak already ≥ 2 from before, so the second-correct gate is already satisfied). Last Tested is updated.
-
-**Streak preservation rationale**: Streak represents "longest recent confidence streak" — resetting it on time decay discards useful history. A returning user who answered a 🟢-Streak-5 correctly once should get 🟢-Streak-6, not 🟡-Streak-1.
-
----
-
-## 6. Disambiguation: `🟡 (time-stale)` vs `⚠️ stale` (content-stale)
-
-Two different "stale" concepts exist in this system:
-
-| Marker | Owner | Meaning |
-|--------|-------|---------|
-| 🟡 in Status | quiz (Phase 1.5) | Concept was 🟢 but not tested in 14+ days — time decay |
-| `⚠️ stale` appended to Status cell | sync (Phase S9) | Concept no longer appears in source material — content drift |
-
-A row can carry both: `🟡 ⚠️ stale` — it's time-stale AND the source no longer mentions it. The `⚠️ stale` flag is a visual hint only; it does not gate quiz selection. Removing a `⚠️ stale` marker requires source material to be re-added or user override.
-
-**📘 ownership**: The `📘 Learned` status is set exclusively by the `lesson` skill (when the user signals understanding for a section). `quiz` only **reads** `📘` (treating it like `(new)` in §4 transitions, replacing the row in place) and never **writes** `📘`. `lesson` may upgrade missing rows to `📘` but must not overwrite existing `🔴/🟡/🟢` rows.
-
----
-
-## 7. Session Option Construction (Phase 2)
-
-After the sweep, count:
+Compute:
 - `undersampled_areas`: areas with Level = ⬜
 - `weak_areas`: areas with Level ∈ {🟥, 🟨}
-- `stale_concepts`: total 🟡 rows across all concept files where `today - LastTested > STALE_DAYS`
 - `all_strong`: all areas with Level ∈ {🟩, 🟦}
 
 Present AskUserQuestion with options built per:
@@ -269,15 +212,14 @@ Present AskUserQuestion with options built per:
 |-----------|--------------|-------------|
 | `undersampled_areas ≥ 1` | "Diagnostic" | Cover {area names joined with '/'}. Diagnostic priority: untested seed concepts AND `Status=📘` rows are equal-priority targets (both are "learned but not quiz-confirmed") |
 | `weak_areas ≥ 1` | "Drill weak" | Targets Weakest Area (unresolved-first priority per §2) |
-| `stale_concepts ≥ 3` | "Drill stale" | Review {N} concepts due for refresh |
 | `all_strong AND not above` | "Hard-mode review" | Challenge mastered material |
 | always | "Choose a section" | Pick any area manually |
 
 ---
 
-## 8. Backfill Rules (for existing vaults without new schema)
+## 6. Backfill Rules (for existing vaults without new schema)
 
-Applied by `quiz` Phase 1.5 as a one-time migration when it detects missing columns/blocks:
+Applied by `quiz` Phase 2.5 as a one-time migration when it detects missing columns/blocks:
 
 | Missing | Backfill |
 |---------|----------|
@@ -289,9 +231,7 @@ Emit one-time notice: "ℹ️ 스키마가 업데이트되었습니다. {N} conc
 
 ---
 
-## 9. Date Arithmetic Note
+## 7. Date Format Note
 
 - All dates stored as `YYYY-MM-DD` (ISO 8601 date only, no time component).
 - Today's date is provided by the conversation's injected `currentDate` context.
-- Age = days between two dates, calendar-based (not 24h), computed inclusively of the end date. `(today=2026-04-18) - (LastTested=2026-04-04) = 14 days` → not yet stale. `2026-04-03` → 15 days → stale.
-- Parse failures (malformed date) → treat as "very old" → stale. Emit warning in sweep report.

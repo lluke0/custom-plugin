@@ -133,7 +133,7 @@ This is the only point where the source note is mutated. Perform in order (per [
 2. **Update tracker for the step itself**:
    - If no row exists for this step's `seed_label` → append: `| {seed_label} | 0 | 0 | 0 | {today} | 📘 |`.
    - If row exists with `📘` → update `Last Tested = today`.
-   - If row exists with `🔴` / `🟡` / `🟢` → **do not modify** (lesson does not overwrite quiz state per progress-rules.md §6).
+   - If row exists with `🔴` / `🟡` / `🟢` → **do not modify** (lesson does not overwrite quiz state per progress-rules.md §4).
 3. Persist the tracker file. Advance to next step.
 
 #### L4.3b — On Question

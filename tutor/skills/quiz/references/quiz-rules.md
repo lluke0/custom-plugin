@@ -39,14 +39,6 @@ When targeting 🔴 concepts from concept files:
 - Test the same underlying knowledge from a different angle
 - E.g., if user confused "400 vs 422", ask a scenario question where they must choose the correct status code for a new situation
 
-## Drilling Stale (🟡) Concepts
-
-When targeting time-stale concepts (`🟡 stale` from Phase 1.5 sweep):
-- These users previously mastered the concept (Streak ≥ 2) but have not been tested in 14+ days
-- Do NOT repeat the exact historical question — the goal is to verify durable understanding, not short-term recall
-- Favor **application / analysis** question types (see §Question Types 2-4) over pure factual recall
-- Difficulty: mix — easy 20%, medium 50%, hard 30%. Too easy wastes the check; too hard falsely demotes recovered mastery
-
 ## AskUserQuestion Format
 
 - 4 questions per round, 4 options each, single-select

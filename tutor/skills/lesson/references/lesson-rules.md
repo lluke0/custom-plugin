@@ -73,7 +73,7 @@ If a message is short and lexicon-matched but ALSO contains a `?` or interrogati
 
 ## §Tracker Updates on Confirmation
 
-Apply this exactly when the user confirms a step. Refer to [progress-rules.md §1, §4, §6](../../_shared/progress-rules.md).
+Apply this exactly when the user confirms a step. Refer to [progress-rules.md §1, §4](../../_shared/progress-rules.md).
 
 ```
 seed_label = (label of current step)

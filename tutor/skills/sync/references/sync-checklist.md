@@ -55,8 +55,8 @@ Verify every item after sync phases complete. Fix and re-verify until all pass.
 - [ ] Rows match current set of active (non-archived) `NN-*/` folders.
 - [ ] New areas: `⬜ Undersampled`, `0/N / - / 0/N`.
 - [ ] Renamed areas: updated name/link, attempts/correct/Streak/seed preserved.
-- [ ] Content-stale rows: `⚠️ stale` flag without losing data (separate from §6 🟡 time-stale).
-- [ ] Stats block recomputed correctly (Total / Covered / Mastered / Stale / Unresolved / Weakest / Strongest).
+- [ ] Content-stale rows: `⚠️ stale` flag without losing data.
+- [ ] Stats block recomputed correctly (Total / Covered / Mastered / Unresolved / Weakest / Strongest).
 
 ## 9. Content Quality (inherited)
 

@@ -2,9 +2,9 @@
 name: quiz
 description: >
   Interactive quiz tutor for markdown StudyVault learning. Args: `diagnostic` (진단평가), `drill-weak`
-  (약점 드릴), `drill-stale` (스테일 복습), `section <area>` (섹션 지정), `hard` (하드 복습). Without args:
+  (약점 드릴), `section <area>` (섹션 지정), `hard` (하드 복습). Without args:
   shows session picker. Triggers: "quiz me", "test me", "let's study", "/quiz", "학습", "퀴즈", "평가".
-argument-hint: "[diagnostic|drill-weak|drill-stale|section <area>|hard|help]"
+argument-hint: "[diagnostic|drill-weak|section <area>|hard|help]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 Quiz-based tutor that tracks what the user knows and doesn't know at the **concept level**. Operates on plain-markdown StudyVaults from `setup`. No Obsidian or proprietary tools required.
 
-> **Spec of record**: All progress calculations (Coverage, Accuracy, Mastery, Level, Status transitions, stale detection) are defined in [progress-rules.md](../_shared/progress-rules.md). Sections referenced as §N below.
+> **Spec of record**: All progress calculations (Coverage, Accuracy, Mastery, Level, Status transitions) are defined in [progress-rules.md](../_shared/progress-rules.md). Sections referenced as §N below.
 
 ## File Structure
 
@@ -41,7 +41,6 @@ If skill args were provided (user typed `/quiz <arg>`), map to session type:
 |-----|---------|
 | `diagnostic` / `진단` | Diagnostic |
 | `drill-weak` / `weak` / `약점` | Drill weak |
-| `drill-stale` / `stale` / `스테일` | Drill stale |
 | `section <area>` / `섹션 <area>` | Choose a section (area = next token after keyword) |
 | `hard` / `hard-mode` / `하드` | Hard-mode review |
 | `help` / `?` | Print available arguments table and stop |
@@ -63,7 +62,7 @@ Path discovery only — **do not read `concepts/*.md` here**. Defer reads to Pha
    2. Else fallback glob `**/StudyVault/*dashboard*` and `**/StudyVault/*대시보드*` (legacy localized names from older vaults).
       - If exactly one match found → **rename it to `dashboard.md`** (one-time migration), then use the canonical path.
       - If multiple matches found → keep the most recently modified one as `dashboard.md`, archive the rest to `StudyVault/archive/duplicate-dashboards/`, and emit a one-time notice: `ℹ️ 중복된 학습 대시보드 N개를 발견했습니다. 가장 최근 파일을 dashboard.md로 정리하고 나머지는 archive/duplicate-dashboards/로 이동했습니다.`
-   3. Else (none found) → defer creation to Phase 2.5 step 4 (template-based, canonical path only).
+   3. Else (none found) → defer creation to Phase 2.5 step 3 (template-based, canonical path only).
 4. Do **not** read dashboard or concept files yet.
 
 ### Phase 2: Ask Session Type (fixed options)
@@ -76,38 +75,26 @@ Always present (header "Session"):
 
 1. **Diagnostic** — Sample broadly to find undersampled concepts
 2. **Drill weak** — Focus on 🔴 unresolved / low-mastery in a chosen area
-3. **Drill stale** — Review 🟡 concepts due for refresh (triggers full stale scan in Phase 2.5)
-4. **Choose a section** — User picks an area manually
-5. **Hard-mode review** — Harder rephrasings of already-mastered concepts
+3. **Choose a section** — User picks an area manually
+4. **Hard-mode review** — Harder rephrasings of already-mastered concepts
 
-For options 2 / 4 / 5, follow up asking which area (from Phase 1's directory list).
+For options 2 / 3 / 4, follow up asking which area (from Phase 1's directory list).
 
-### Phase 2.5: Load Selected Scope & Lazy Sweep
+### Phase 2.5: Load Selected Scope & Schema Backfill
 
-Now — and only now — read files. Scope depends on Phase 2 selection:
-
-- **Drill weak / Choose a section / Hard-mode / Diagnostic** → read `concepts/{selected-area}.md` + dashboard.
-- **Drill stale** → read `concepts/*.md` (all) + dashboard. Only intent that requires full scan; user opted in.
+Now — and only now — read files: `concepts/{selected-area}.md` + dashboard.
 
 Then on the loaded scope:
 
-1. **Schema backfill** (one-time per file): If `Streak` column or `## Concepts (N total)` seed missing → apply [§8](../_shared/progress-rules.md). Files outside loaded scope are backfilled lazily on next selection or in bulk in Phase 6.
-2. **Stale detection**: If `Status == 🟢 AND (today − Last Tested) > 14 days` → demote to 🟡 (Streak preserved).
-3. **Persist**: Write changed concept file(s). Do not touch Attempts / Correct / Error notes.
-4. **Create dashboard** at the canonical path **`StudyVault/dashboard.md`** from [templates.md](references/templates.md) if missing. Do NOT create any other variant (`학습 대시보드.md`, `Learning Dashboard.md`, etc.) — there is exactly one learning dashboard per vault.
-5. **Notify user** only if scope changed:
-   ```
-   ℹ️ {N}개 개념이 복습 대기(stale)로 전환되었습니다.
-      - {area}: {count}개
-   ```
-   Dashboard recompute deferred to Phase 6 (full-scan accuracy).
+1. **Schema backfill** (one-time per file): If `Streak` column or `## Concepts (N total)` seed missing → apply [§6](../_shared/progress-rules.md). Files outside loaded scope are backfilled lazily on next selection or in bulk in Phase 6.
+2. **Persist**: Write changed concept file(s) only if backfill modified them. Do not touch Attempts / Correct / Error notes.
+3. **Create dashboard** at the canonical path **`StudyVault/dashboard.md`** from [templates.md](references/templates.md) if missing. Do NOT create any other variant (`학습 대시보드.md`, `Learning Dashboard.md`, etc.) — there is exactly one learning dashboard per vault.
 
 ### Phase 3: Build Questions
 
 1. Read markdown files in target section(s).
 2. Pick drill targets per session type:
    - **Drill weak**: 🔴 unresolved → rephrase in new contexts.
-   - **Drill stale**: 🟡 stale across all areas → rephrase to test same knowledge from a different angle (no verbatim repeats).
    - **Diagnostic**: undersampled areas; untested seed concepts have priority.
    - **Choose a section / Hard-mode**: sample broadly from chosen area.
 3. Craft exactly 4 questions following [quiz-rules.md](references/quiz-rules.md).
@@ -169,7 +156,7 @@ Recompute all columns per [§2 Dashboard Schema](../_shared/progress-rules.md) a
 
 **Total row Level**: Compute from aggregated cov/mas across all areas, AND apply this rule: if **any** non-⬜ area is 🟥 OR **any** tracker has unresolved ≥ 1, Total cannot exceed 🟨. Total may be 🟦 only when every non-⬜ area is 🟦.
 
-Stats: Total Concepts, Covered, Mastered (🟢), Stale (🟡), Unresolved (🔴), Weakest/Strongest Area (by Mastery, ⬜ excluded).
+Stats: Total Concepts, Covered, Mastered (🟢), Unresolved (🔴), Weakest/Strongest Area (by Mastery, ⬜ excluded).
 
 Dashboard stays compact — no session logs, no per-question details.
 

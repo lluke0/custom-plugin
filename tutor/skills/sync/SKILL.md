@@ -30,7 +30,7 @@ ALWAYS REQUIRE APPROVAL (AskUserQuestion):
 
 AUTOMATIC (non-destructive):
   - 새 area → dashboard.md Proficiency 표에 ⬜ 행 추가 + concepts/{area}.md 생성 (seed populate, tracker 비움)
-  - content-stale concept 행에 ⚠️ 플래그 추가 (삭제 아님, progress-rules §6의 🟡 time-stale과 별개)
+  - content-stale concept 행에 ⚠️ 플래그 추가 (삭제 아님)
   - Coverage / Accuracy / Mastery / Level 재계산 (progress-rules §2, §3)
 
 ALWAYS SKIP:
@@ -163,7 +163,7 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 | 🗑️ area 삭제 | `concepts/<area>.md` → `archive/concepts/<area>.md`. Dashboard 행에 `(archived)` + Details 링크 archive 경로로. | **Ask** |
 | ✏️ area rename | `concepts/<old>.md` → `concepts/<new>.md`. 내부 H1 + dashboard 행 이름/링크 갱신. **Tracker 행 (Streak 포함) · Error notes · seed block 전부 원본 보존.** | **Ask** (diff 제시) |
 | ✏️ area 병합 (A+B → C) | seed 병합·중복 제거. Attempts/Correct 합산. **Streak은 합산하지 않고 min(A,B)** (보수적). Error notes는 `**source area**` 부제로 모두 보존. | **Ask** (프리뷰) |
-| ✏️ source 내용만 변경 | concepts 건드리지 않음. concept가 source에서 사라지면 Status 옆 `⚠️ stale` (content-stale; §6의 🟡 time-stale과 별개 마커). | Auto (표시만) |
+| ✏️ source 내용만 변경 | concepts 건드리지 않음. concept가 source에서 사라지면 Status 옆 `⚠️ stale` (content-stale 마커). | Auto (표시만) |
 | ✏️ 새 concept note 추가 | 노트 내 `##` 섹션(boilerplate 제외)마다 seed 1개씩 추가, tracker는 그대로. dashboard `Concepts +<섹션 수>`, Covered/Mastery 재계산. | Auto |
 | ✏️ concept note 내 `##` 섹션 추가/삭제 | 추가된 섹션 → seed 추가 (`Concepts +N`). 삭제된 섹션 → seed에서 제거; 해당 tracker 행은 유지 + Status 옆 `⚠️ stale` (`Concepts −N`). | Auto (표시만) |
 | ✏️ concept note 삭제 | 해당 노트에서 파생된 모든 seed 제거. Tracker에 이미 있는 행 유지 + Status 옆 `⚠️ stale`. `Concepts −<제거된 seed 수>`. | Auto (표시만) |
@@ -176,7 +176,6 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 ```markdown
 | pipeline-hazard | 3 | 2 | 2 | 2026-03-14 | 🟢 ⚠️ stale |
 ```
-> `⚠️ stale`(content) 와 🟡(time-stale, §6) 는 공존 가능: `🟡 ⚠️ stale`.
 
 **통계 재계산** (area 추가/이동/리네이밍 후 MANDATORY). Spec: [../_shared/progress-rules.md §2, §3](../_shared/progress-rules.md):
 - `Concepts` = seed bullet count
@@ -184,7 +183,7 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 - `Accuracy` = 🟢 count / tracker rows (denom 0 → `-`)
 - `Mastery` = 🟢 count / Concepts
 - `Level` = §3 임계값 (Coverage gate + Mastery tier)
-- Stats: Total Concepts, Covered, Mastered, Stale, Unresolved, Weakest/Strongest (⬜ 제외)
+- Stats: Total Concepts, Covered, Mastered, Unresolved, Weakest/Strongest (⬜ 제외)
 
 **Archive 구조**:
 ```

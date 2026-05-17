@@ -44,7 +44,6 @@ Folder structure mirrors the source's chapter/section layout. Do not re-cluster 
 - **Covered**: 0 / <sum> (-)
 - **Learned (📘)**: 0
 - **Mastered (🟢)**: 0 / <sum> (-)
-- **Stale (🟡)**: 0
 - **Unresolved (🔴)**: 0
 - **Weakest Area**: -
 - **Strongest Area**: -
@@ -75,7 +74,7 @@ One per area. Built with seed populated from the concept notes in `NN-<area>/*.m
 ```
 
 - **Seed block**: MANDATORY. **Section-level granularity** — for each concept note in the area, emit one seed per `##` heading inside that file (excluding `Related Notes` / `Related Concepts` / `관련 노트`). One `.md` file → multiple seed entries. Label format: `<file-basename> · <section-title>` (or `<section-title>` alone if globally unique within the area). Authoritative total for Coverage.
-- **Tracker**: starts empty; `quiz` adds rows on first test, `lesson` adds rows on first explanation (Status = `📘`). Column order fixed. Status enum: `📘` learned (lesson-only) / `🔴` unresolved / `🟡` tentative or stale / `🟢` confirmed. See [../../_shared/progress-rules.md §1, §4](../../_shared/progress-rules.md).
+- **Tracker**: starts empty; `quiz` adds rows on first test, `lesson` adds rows on first explanation (Status = `📘`). Column order fixed. Status enum: `📘` learned (lesson-only) / `🔴` unresolved / `🟡` tentative / `🟢` confirmed. See [../../_shared/progress-rules.md §1, §4](../../_shared/progress-rules.md).
 - **Error Notes**: header from creation; entries never deleted.
 
 ## Dashboard MOC Template

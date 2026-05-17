@@ -34,7 +34,6 @@ Filename localized to `{LANG}` (e.g. `학습 대시보드.md` for Korean). Colum
 - **Covered**: 0 / 0 (-)
 - **Learned (📘)**: 0
 - **Mastered (🟢)**: 0 / 0 (-)
-- **Stale (🟡)**: 0
 - **Unresolved (🔴)**: 0
 - **Weakest Area**: -
 - **Strongest Area**: -

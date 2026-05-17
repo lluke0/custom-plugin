@@ -162,11 +162,10 @@ Interactive quiz tutor that tracks what you know and don't know at the **concept
 |------|----------------|-------|
 | Diagnostic | Undersampled areas (⬜) exist | Broad assessment of new areas (coverage-building) |
 | Drill weak areas | Weak areas (🟥/🟨) exist | Targeted practice on struggles |
-| **Drill stale** | ≥ 3 time-stale concepts (🟡, 14+ days untested) | Refresh fading mastery (auto-detected per `/quiz` run) |
 | Choose a section | Always | Study any area on demand |
-| Hard-mode review | All areas 🟩/🟦, no stale | Challenge mastered material |
+| Hard-mode review | All areas 🟩/🟦 | Challenge mastered material |
 
-CLI shortcuts: `/quiz diagnostic`, `/quiz drill-weak`, `/quiz drill-stale`, `/quiz section <area>`, `/quiz hard`.
+CLI shortcuts: `/quiz diagnostic`, `/quiz drill-weak`, `/quiz section <area>`, `/quiz hard`.
 
 ### Quiz Flow
 
@@ -192,14 +191,13 @@ Proficiency is tracked per area with two axes — **Coverage** (how many concept
 
 - 📘 learned (via `lesson`, not yet quiz-tested)
 - 🔴 unresolved (currently missed)
-- 🟡 tentative (one correct, not yet confirmed) OR time-stale (was 🟢 but >14 days untested)
+- 🟡 tentative (one correct, not yet confirmed)
 - 🟢 confirmed (Streak ≥ 2)
 
 Status transitions:
 - First correct → 🟡 (needs Streak ≥ 2 to confirm as 🟢)
 - 🟡 → correct → 🟢 (Streak builds up — unless concept was wrong earlier in same session, in which case it's capped at 🟡 until next session)
 - Any → wrong → 🔴 (error note added, Streak reset)
-- 🟢 concept untested for 14+ days → 🟡 (stale) — **auto-detected per `/quiz` run**; one correct answer returns it to 🟢
 
 Error notes are permanent learning history — never deleted even after a concept returns to 🟢.
 
@@ -326,7 +324,7 @@ tutor-skill/
 │   ├── _shared/                # Cross-skill specs (referenced by setup/quiz/lesson/sync)
 │   │   ├── cwd-boundary.md
 │   │   ├── portability-rules.md
-│   │   └── progress-rules.md   # Spec of record for Coverage / Mastery / Streak / Stale
+│   │   └── progress-rules.md   # Spec of record for Coverage / Mastery / Streak
 │   ├── setup/
 │   │   ├── SKILL.md
 │   │   └── references/
