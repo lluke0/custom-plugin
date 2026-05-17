@@ -18,7 +18,7 @@ Folder structure mirrors the source's chapter/section layout. Do not re-cluster 
 
 ## Learning Dashboard Template (`StudyVault/dashboard.md`)
 
-> Canonical filename: **`dashboard.md`** at the vault root — lowercase English so cross-skill globs are deterministic. The H1 and table content stay in the source language. Distinct from the `00-Dashboard/` MOC bundle (different artifact). Spec of record: [../../quiz/references/progress-rules.md §2, §3](../../quiz/references/progress-rules.md).
+> Canonical filename: **`dashboard.md`** at the vault root — lowercase English so cross-skill globs are deterministic. The H1 and table content stay in the source language. Distinct from the `00-Dashboard/` MOC bundle (different artifact). Spec of record: [../../_shared/progress-rules.md §2, §3](../../_shared/progress-rules.md).
 
 ```markdown
 # Learning Dashboard
@@ -42,6 +42,7 @@ Folder structure mirrors the source's chapter/section layout. Do not re-cluster 
 
 - **Total Concepts**: <sum>
 - **Covered**: 0 / <sum> (-)
+- **Learned (📘)**: 0
 - **Mastered (🟢)**: 0 / <sum> (-)
 - **Stale (🟡)**: 0
 - **Unresolved (🔴)**: 0
@@ -74,7 +75,7 @@ One per area. Built with seed populated from the concept notes in `NN-<area>/*.m
 ```
 
 - **Seed block**: MANDATORY. **Section-level granularity** — for each concept note in the area, emit one seed per `##` heading inside that file (excluding `Related Notes` / `Related Concepts` / `관련 노트`). One `.md` file → multiple seed entries. Label format: `<file-basename> · <section-title>` (or `<section-title>` alone if globally unique within the area). Authoritative total for Coverage.
-- **Tracker**: starts empty; `quiz` adds rows on first test, `lesson` adds rows on first explanation (Status = `📘`). Column order fixed. Status enum: `📘` learned (lesson-only) / `🔴` unresolved / `🟡` tentative or stale / `🟢` confirmed. See [../../quiz/references/progress-rules.md §1, §4](../../quiz/references/progress-rules.md).
+- **Tracker**: starts empty; `quiz` adds rows on first test, `lesson` adds rows on first explanation (Status = `📘`). Column order fixed. Status enum: `📘` learned (lesson-only) / `🔴` unresolved / `🟡` tentative or stale / `🟢` confirmed. See [../../_shared/progress-rules.md §1, §4](../../_shared/progress-rules.md).
 - **Error Notes**: header from creation; entries never deleted.
 
 ## Dashboard MOC Template

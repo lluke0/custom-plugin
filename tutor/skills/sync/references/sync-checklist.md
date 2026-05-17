@@ -51,7 +51,7 @@ Verify every item after sync phases complete. Fix and re-verify until all pass.
 
 ## 8. Dashboard Synchronization
 
-- [ ] Schema is `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` (per [progress-rules §2](../../quiz/references/progress-rules.md)).
+- [ ] Schema is `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` (per [progress-rules §2](../../_shared/progress-rules.md)).
 - [ ] Rows match current set of active (non-archived) `NN-*/` folders.
 - [ ] New areas: `⬜ Undersampled`, `0/N / - / 0/N`.
 - [ ] Renamed areas: updated name/link, attempts/correct/Streak/seed preserved.

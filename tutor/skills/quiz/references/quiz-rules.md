@@ -55,8 +55,8 @@ When targeting time-stale concepts (`🟡 stale` from Phase 1.5 sweep):
 ## File Update Protocol
 
 After grading:
-1. Update `concepts/{area}.md` — apply [progress-rules.md §4 (Status Transitions)](progress-rules.md) including Streak column
-2. Update dashboard — recompute Coverage / Accuracy / Mastery / Level per [progress-rules.md §2, §3](progress-rules.md)
+1. Update `concepts/{area}.md` — apply [progress-rules.md §4 (Status Transitions)](../../_shared/progress-rules.md) including Streak column
+2. Update dashboard — recompute Coverage / Accuracy / Mastery / Level per [progress-rules.md §2, §3](../../_shared/progress-rules.md)
 3. Level badges (coverage-gated): ⬜ cov<50% · 🟥 weak · 🟨 fair · 🟩 good · 🟦 mastered
 
 ## Language Rule

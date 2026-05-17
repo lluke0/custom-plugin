@@ -4,13 +4,15 @@ description: >
   Interactive quiz tutor for markdown StudyVault learning. Args: `diagnostic` (진단평가), `drill-weak`
   (약점 드릴), `drill-stale` (스테일 복습), `section <area>` (섹션 지정), `hard` (하드 복습). Without args:
   shows session picker. Triggers: "quiz me", "test me", "let's study", "/quiz", "학습", "퀴즈", "평가".
+argument-hint: "[diagnostic|drill-weak|drill-stale|section <area>|hard|help]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 
 # Tutor Quiz Skill
 
 Quiz-based tutor that tracks what the user knows and doesn't know at the **concept level**. Operates on plain-markdown StudyVaults from `setup`. No Obsidian or proprietary tools required.
 
-> **Spec of record**: All progress calculations (Coverage, Accuracy, Mastery, Level, Status transitions, stale detection) are defined in [progress-rules.md](references/progress-rules.md). Sections referenced as §N below.
+> **Spec of record**: All progress calculations (Coverage, Accuracy, Mastery, Level, Status transitions, stale detection) are defined in [progress-rules.md](../_shared/progress-rules.md). Sections referenced as §N below.
 
 ## File Structure
 
@@ -89,7 +91,7 @@ Now — and only now — read files. Scope depends on Phase 2 selection:
 
 Then on the loaded scope:
 
-1. **Schema backfill** (one-time per file): If `Streak` column or `## Concepts (N total)` seed missing → apply [§8](references/progress-rules.md). Files outside loaded scope are backfilled lazily on next selection or in bulk in Phase 6.
+1. **Schema backfill** (one-time per file): If `Streak` column or `## Concepts (N total)` seed missing → apply [§8](../_shared/progress-rules.md). Files outside loaded scope are backfilled lazily on next selection or in bulk in Phase 6.
 2. **Stale detection**: If `Status == 🟢 AND (today − Last Tested) > 14 days` → demote to 🟡 (Streak preserved).
 3. **Persist**: Write changed concept file(s). Do not touch Attempts / Correct / Error notes.
 4. **Create dashboard** at the canonical path **`StudyVault/dashboard.md`** from [templates.md](references/templates.md) if missing. Do NOT create any other variant (`학습 대시보드.md`, `Learning Dashboard.md`, etc.) — there is exactly one learning dashboard per vault.
@@ -126,7 +128,9 @@ Use AskUserQuestion: 4 questions, 4 options each, single-select. Header `Q1. Top
 
 #### 1. Update concept file (`concepts/{area}.md`)
 
-Apply transitions from [§4 Status Transitions](references/progress-rules.md). Key rules:
+> **Session Wrong-Answer Gate (MANDATORY — 가장 흔한 Mastery 인플레이션 버그)**: Maintain `session_wrong_set` for this quiz invocation (initialized empty at Phase 4 start). When a concept is graded wrong, add it to the set. Before applying any `🟡 → correct → 🟢` transition below, check `concept ∈ session_wrong_set` — if true, **cap Status at 🟡 even though Streak ≥ 2** (Streak itself still increments normally). The cap resets at the next quiz invocation. Spec: [§4 "세션 내 오답 게이트"](../_shared/progress-rules.md).
+
+Apply transitions from [§4 Status Transitions](../_shared/progress-rules.md). Key rules:
 
 - Always: `Last Tested = today`, `Attempts += 1`.
 - `Correct += 1` only if correct.
@@ -155,7 +159,7 @@ Tracker row + Error note formats: see [templates.md](references/templates.md).
 
 **Read all `concepts/*.md` here** (first full read of session). Apply pending schema backfill to files not loaded earlier.
 
-Recompute all columns per [§2 Dashboard Schema](references/progress-rules.md) and [§3 Level Thresholds](references/progress-rules.md):
+Recompute all columns per [§2 Dashboard Schema](../_shared/progress-rules.md) and [§3 Level Thresholds](../_shared/progress-rules.md):
 
 - `Concepts`: from seed block (or fallback)
 - `Covered` = `|tracker rows| / Concepts`
@@ -177,7 +181,7 @@ Dashboard / Concept file / Tracker row / Error note formats: see [references/tem
 
 ## Important Reminders
 
-- ALWAYS read [progress-rules.md](references/progress-rules.md) before Phase 2.5 / Phase 6 (spec of record).
+- ALWAYS read [progress-rules.md](../_shared/progress-rules.md) before Phase 2.5 / Phase 6 (spec of record).
 - ALWAYS read [quiz-rules.md](references/quiz-rules.md) before creating questions. Zero hints.
 - Error notes are NEVER deleted — permanent learning history.
 - All cross-file links use relative-path markdown, never wiki-links.

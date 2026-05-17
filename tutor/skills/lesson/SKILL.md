@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 
 Step-by-step concept tutor that walks the learner through one concept note `##` section at a time. Advances on explicit user confirmation. Branches into supplementary explanation when the learner asks a question, persisting that supplement back into the source note so the next session sees it.
 
-> **Spec of record**: All progress calculations and the `📘 Learned` status are defined in [../quiz/references/progress-rules.md](../quiz/references/progress-rules.md). Sections referenced as §N below.
+> **Spec of record**: All progress calculations and the `📘 Learned` status are defined in [../_shared/progress-rules.md](../_shared/progress-rules.md). Sections referenced as §N below.
 >
 > **Lesson rules**: section selection, question handling, and persistence rules in [lesson-rules.md](references/lesson-rules.md).
 
@@ -47,7 +47,7 @@ Detect user's language from their message → `{LANG}`. All output and any new s
 1. Argument required. If missing → ask user for the concept note path. Do not pick automatically.
 2. Verify path exists, is a `.md` file, and lives under a `StudyVault/NN-<area>/` directory.
 3. If not under any `NN-<area>/`: stop and tell user — this skill operates only on concept notes inside an area folder.
-4. Compute `area = parent directory basename` (e.g. `01-DNS` → area name as it appears in `concepts/`). Resolve `tracker_path = StudyVault/concepts/{area}.md` per [progress-rules.md §1](../quiz/references/progress-rules.md). If tracker missing → stop and tell user to run `/setup` or `/sync` first.
+4. Compute `area = parent directory basename` (e.g. `01-DNS` → area name as it appears in `concepts/`). Resolve `tracker_path = StudyVault/concepts/{area}.md` per [progress-rules.md §1](../_shared/progress-rules.md). If tracker missing → stop and tell user to run `/setup` or `/sync` first.
 
 ### Phase L2: Parse Sections
 
@@ -150,7 +150,7 @@ The user can ask multiple questions (including follow-ups when an earlier answer
 
 Once the loop completes (last step confirmed):
 
-1. **Recompute Learning Dashboard** per [progress-rules.md §2](../quiz/references/progress-rules.md). Read all `concepts/*.md`. Update the row for this area and the Stats block (including the `Learned (📘)` count). Write the dashboard at the canonical path **`StudyVault/dashboard.md`**. If a legacy localized file exists at the vault root (`*dashboard*` / `*대시보드*` other than `dashboard.md`), rename it to `dashboard.md` before writing — never write a second dashboard file.
+1. **Recompute Learning Dashboard** per [progress-rules.md §2](../_shared/progress-rules.md). Read all `concepts/*.md`. Update the row for this area and the Stats block (including the `Learned (📘)` count). Write the dashboard at the canonical path **`StudyVault/dashboard.md`**. If a legacy localized file exists at the vault root (`*dashboard*` / `*대시보드*` other than `dashboard.md`), rename it to `dashboard.md` before writing — never write a second dashboard file.
 2. **Print a session summary**:
    ```
    ✅ {file-basename} 학습 완료
@@ -164,14 +164,14 @@ Once the loop completes (last step confirmed):
 - Lesson never deletes or modifies pre-existing `##` sections in the concept note. Only appends.
 - Lesson never demotes 🟢 / 🟡 / 🔴 to 📘. The state machine direction is `📘 → {🔴, 🟡, 🟢}` only, owned by `quiz`.
 - Lesson never modifies error notes — they belong to `quiz`.
-- Every new tracker row goes through the seed block first. The Option A invariant from [progress-rules.md §1](../quiz/references/progress-rules.md) is preserved: `|tracker rows| ≤ |seed entries|`.
+- Every new tracker row goes through the seed block first. The Option A invariant from [progress-rules.md §1](../_shared/progress-rules.md) is preserved: `|tracker rows| ≤ |seed entries|`.
 - **Note mtime invariant**: between an understanding prompt and the user's confirmation, the source note's mtime never changes. Q&A persistence is strictly deferred to confirmation.
 - If the user aborts mid-step ("그만" / Ctrl-C) before confirming, the pending buffer is **discarded** — unconfirmed Q&As are not written to disk. Already-confirmed steps are already persisted.
 - All cross-file references use relative-path markdown.
 
 ## Important Reminders
 
-- ALWAYS read [progress-rules.md](../quiz/references/progress-rules.md) before Phase L3 / L4.3 / L5 — it defines the `📘` semantics and the dashboard formula.
+- ALWAYS read [progress-rules.md](../_shared/progress-rules.md) before Phase L3 / L4.3 / L5 — it defines the `📘` semantics and the dashboard formula.
 - ALWAYS read [lesson-rules.md](references/lesson-rules.md) before Phase L2 / L4.
 - Never auto-advance on ambiguous responses. When in doubt, treat as a question.
 - Never write to the source note while a step is "in-progress" (between prompt and confirmation). Q&A goes through the pending buffer.

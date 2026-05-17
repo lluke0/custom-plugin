@@ -178,7 +178,7 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 ```
 > `⚠️ stale`(content) 와 🟡(time-stale, §6) 는 공존 가능: `🟡 ⚠️ stale`.
 
-**통계 재계산** (area 추가/이동/리네이밍 후 MANDATORY). Spec: [../quiz/references/progress-rules.md §2, §3](../quiz/references/progress-rules.md):
+**통계 재계산** (area 추가/이동/리네이밍 후 MANDATORY). Spec: [../_shared/progress-rules.md §2, §3](../_shared/progress-rules.md):
 - `Concepts` = seed bullet count
 - `Covered` = tracker rows / Concepts
 - `Accuracy` = 🟢 count / tracker rows (denom 0 → `-`)

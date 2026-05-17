@@ -200,23 +200,35 @@ not gated = (concept NOT IN session_wrong_set)
 
 ## 5. Stale Detection — Age-based Transition
 
-**Trigger**: Phase 1.5 (Stale Sweep) in `quiz` SKILL.md, run once per quiz invocation, between Phase 1 (Discover) and Phase 2 (Ask Session Type).
+**Trigger**: Phase 2.5 (Load Selected Scope & Lazy Sweep) in `quiz` SKILL.md, run once per quiz invocation **after** the user selects a session type. Scope is defined by the caller, not by this spec.
+
+**Scope** (per caller selection):
+
+| Session type | Sweep scope | Rationale |
+|---|---|---|
+| `drill-stale` | All `concepts/*.md` (full vault sweep) | User explicitly opted in to a stale review — pay the full-scan cost here |
+| `drill-weak` / `section <area>` / `hard` / `diagnostic` | Only `concepts/{selected-area}.md` (loaded scope) | Avoid forcing a full vault read for a 4-question drill |
+| `lesson` Phase L5 finalize | All `concepts/*.md` (dashboard recompute reads everything) | Lesson's final dashboard write is the natural place to catch other-area stale rows |
+
+**Lazy-scope tradeoff**: stale rows in unselected areas remain 🟢 until that area is next touched (by `quiz` or `lesson`). This is intentional — full sweeps on every quiz invocation would dominate I/O for small drills. Users wanting comprehensive stale catching choose `drill-stale`.
 
 **Algorithm**:
 
 ```
 today = current date (YYYY-MM-DD)
 STALE_DAYS = 14
+SCOPE = caller-defined set of concepts/{area}.md files (see table above)
 
-for each concepts/{area}.md:
+for each concepts/{area}.md in SCOPE:
     for each row in tracker table:
         if Status == 🟢 and (today - parse(Last Tested)).days > STALE_DAYS:
             Status ← 🟡
             # Streak is NOT reset — preserved as learning history
     if any row changed: write concepts/{area}.md
 
-recompute dashboard Proficiency table per §2, §3
-write dashboard
+# Dashboard recompute happens later (quiz Phase 6 / lesson Phase L5),
+# which reads all concepts/*.md regardless of sweep scope — so stale
+# transitions in SCOPE are reflected in the dashboard on the next write.
 
 if any row changed:
     emit notice to user: "ℹ️ N개 개념이 복습 대기(stale)로 전환되었습니다: …"

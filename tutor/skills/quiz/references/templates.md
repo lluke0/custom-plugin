@@ -4,7 +4,7 @@ Read this file ONLY when:
 - Phase 2.5 needs to create a new dashboard (no `*dashboard*` exists)
 - Phase 6 needs to create a new `concepts/{area}.md` on the fly (no seed)
 
-Filename localized to `{LANG}` (e.g. `학습 대시보드.md` for Korean). Column schema follows [progress-rules.md §2](progress-rules.md).
+Filename localized to `{LANG}` (e.g. `학습 대시보드.md` for Korean). Column schema follows [progress-rules.md §2](../../_shared/progress-rules.md).
 
 ---
 
@@ -32,6 +32,7 @@ Filename localized to `{LANG}` (e.g. `학습 대시보드.md` for Korean). Colum
 
 - **Total Concepts**: 0
 - **Covered**: 0 / 0 (-)
+- **Learned (📘)**: 0
 - **Mastered (🟢)**: 0 / 0 (-)
 - **Stale (🟡)**: 0
 - **Unresolved (🔴)**: 0

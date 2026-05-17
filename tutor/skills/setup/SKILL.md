@@ -3,6 +3,8 @@ name: setup
 description: >
   Builds a portable markdown StudyVault from source PDFs/text/web by quoting source prose verbatim
   with page citations and embedding all source visuals (figures, tables, equations) as captured PNGs.
+  Triggers: "/setup", "vault 만들어줘", "공부 자료 정리", "스터디볼트 만들어줘", "study materials 정리",
+  "create studyvault", "build vault from sources", "--enrich" (re-audit existing vault for fidelity gaps).
 argument-hint: "[source-path-or-url] | --enrich"
 allowed-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch
 ---
@@ -89,7 +91,7 @@ Two distinct artifacts. Both draw content ONLY from source:
    - `00-Dashboard/quick-reference.md` — verbatim quotes of source's own definitions and formulas with page citations. Each entry: `**Term** — > "exact source text" (p.N) → [Concept Note](relative/path.md)`. If the source has no clean definition for a term, **omit it** — do NOT compose one.
    - `00-Dashboard/exam-traps.md` — quotes ONLY of source's own warning/note/caution callouts (e.g., "주의:", "Warning:", "주목:", "흔한 오류"). If the source has no such callouts, the file states so in one line. Do NOT generate trap commentary.
 
-2. **Learning progress dashboard** — exactly ONE file at the canonical path **`StudyVault/dashboard.md`** (lowercase, English filename so cross-skill globs are deterministic). The H1 and all table content MUST be in the source language (e.g. `# 학습 대시보드`). Per "Learning Dashboard Template" in [templates.md](references/templates.md). All areas start at ⬜ Undersampled / 0 Mastery. Columns MUST be exactly `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` — matches the schema `quiz` reads. Spec of record: [../quiz/references/progress-rules.md §2](../quiz/references/progress-rules.md).
+2. **Learning progress dashboard** — exactly ONE file at the canonical path **`StudyVault/dashboard.md`** (lowercase, English filename so cross-skill globs are deterministic). The H1 and all table content MUST be in the source language (e.g. `# 학습 대시보드`). Per "Learning Dashboard Template" in [templates.md](references/templates.md). All areas start at ⬜ Undersampled / 0 Mastery. Columns MUST be exactly `Area | Concepts | Covered | Accuracy | Mastery | Level | Details` — matches the schema `quiz` reads. Spec of record: [../_shared/progress-rules.md §2](../_shared/progress-rules.md).
 
 > **Single-file invariant (MANDATORY)**: exactly ONE learning-progress dashboard at `StudyVault/dashboard.md`. Do NOT also create `학습 대시보드.md`, `Learning Dashboard.md`, `00-Dashboard/dashboard.md`. If a legacy localized file exists at vault root, **rename to `dashboard.md`** instead of creating a new one.
 
