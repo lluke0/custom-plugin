@@ -24,8 +24,8 @@
         "repo": "epoko77-ai/im-not-ai",
         "path": ".claude"
       },
-      "description": "AI(ChatGPT·Claude·Gemini)가 쓴 한글 텍스트를 사람이 쓴 글처럼 윤문해주는 오케스트레이터. 번역투·영어 인용·기계적 병렬·관용구 등 10대 카테고리 40+ AI 티 패턴을 탐지·분류해 자연스러운 한국어로 재작성. /humanize, /humanize-redo 명령 포함.",
-      "version": "1.5.0",
+      "description": "AI(ChatGPT·Claude·Gemini)가 쓴 한글 텍스트를 사람이 쓴 글처럼 윤문해주는 오케스트레이터. 한국 번역학계 8대 번역투 유형 + post-editese 정량 트랙 기반으로 40+ AI 티 패턴을 탐지·분류해 자연스러운 한국어로 재작성. /humanize, /humanize-redo 명령 포함.",
+      "version": "2.0.0",
       "category": "writing",
       "tags": ["korean", "humanize", "ai-detection", "translationese", "style-rewriting"]
     }
