@@ -28,6 +28,7 @@ Refresh or remove the marketplace later with:
 | Plugin | Description |
 |--------|-------------|
 | [`tutor`](./tutor/) | Turn documents into a portable markdown StudyVault, quiz yourself at the concept level, and browse it in a local web viewer. Bundles `/setup`, `/tutor`, and `/view`. |
+| [`im-not-ai`](https://github.com/epoko77-ai/im-not-ai) | AI가 쓴 한글 텍스트를 사람이 쓴 글처럼 윤문해주는 오케스트레이터. 번역투·영어 인용·기계적 병렬 등 40+ AI 티 패턴을 탐지·분류해 자연스러운 한국어로 재작성. `/humanize`, `/humanize-redo` 포함. |
 
 ### Install a plugin
 
