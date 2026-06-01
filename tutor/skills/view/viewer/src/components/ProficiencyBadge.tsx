@@ -69,10 +69,12 @@ export function levelFromRate(rate: number | null): ProficiencyLevel {
 interface Props {
   level: ProficiencyLevel
   rate?: number | null
+  /** Prestige tier from the rebirth skill (⭐×N). 0 / undefined → no star shown. */
+  prestige?: number
   size?: 'sm' | 'md' | 'lg'
 }
 
-export function ProficiencyBadge({ level, rate, size = 'md' }: Props) {
+export function ProficiencyBadge({ level, rate, prestige, size = 'md' }: Props) {
   const s = LEVEL_STYLES[level]
   const isDark = typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
   const sizeStyle =
@@ -120,6 +122,20 @@ export function ProficiencyBadge({ level, rate, size = 'md' }: Props) {
           }}
         >
           {rate}%
+        </span>
+      )}
+      {typeof prestige === 'number' && prestige > 0 && (
+        <span
+          aria-label={`prestige tier ${prestige}`}
+          style={{
+            marginLeft: '3px',
+            color: isDark ? '#ffd86b' : '#c8870a',
+            fontWeight: 600,
+            fontSize: '0.92em',
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          ⭐×{prestige}
         </span>
       )}
     </span>

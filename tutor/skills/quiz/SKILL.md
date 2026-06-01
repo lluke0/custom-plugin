@@ -153,6 +153,7 @@ Recompute all columns per [§2 Dashboard Schema](../_shared/progress-rules.md) a
 - `Accuracy` = `|🟢| / |tracker rows|`
 - `Mastery` = `|🟢| / Concepts`
 - `Level` from §3 — **all three gates must be checked**: Coverage gate, Mastery tier, AND **Unresolved gate (`unresolved == 0`)**. Any 🔴 row in the tracker forces Level to 🟨 or lower regardless of cov/mas. See §3 edge cases.
+- **Prestige suffix (§8)**: if an area's concept file carries `prestige_tier ≥ 1`, append ` ⭐×N` to its Level cell (e.g. `🟦 Mastered ⭐×2`). When recomputing, **preserve** any existing `⭐×N` suffix — quiz never changes `prestige_tier`; only the `rebirth` skill does.
 
 **Total row Level**: Compute from aggregated cov/mas across all areas, AND apply this rule: if **any** non-⬜ area is 🟥 OR **any** tracker has unresolved ≥ 1, Total cannot exceed 🟨. Total may be 🟦 only when every non-⬜ area is 🟦.
 
@@ -173,3 +174,4 @@ Dashboard / Concept file / Tracker row / Error note formats: see [references/tem
 - Error notes are NEVER deleted — permanent learning history.
 - All cross-file links use relative-path markdown, never wiki-links.
 - **"Mastered/마스터" 어휘 사용 규칙**: 사용자에게 보여주는 자유 텍스트(축하 멘트, 요약 문장 등)에서 "Mastered", "마스터", "정복" 같은 표현은 **해당 영역의 Level이 §3 기준 🟦 Mastered일 때만** 사용한다. 그 외에는 "정답률 향상", "이번 세션에서 N개 개선", "🟡로 승급", "🔴 N개 남음" 처럼 사실 기반 표현을 쓴다. 한 문제만 맞아도 Status가 🟢이 되었다는 이유로 area를 "마스터"라고 부르지 않는다.
+- **환생(rebirth)과의 구분**: `Hard-mode review`는 진행도를 리셋하지 않는 1회성 복습이다. 마스터한 영역을 **초기화하고 더 어려운 회차로 재정복**하려는 사용자에게는 별도 `/rebirth` 스킬을 안내한다. quiz는 `prestige_tier`를 절대 변경하지 않으며, dashboard 재계산 시 기존 `⭐×N` suffix를 보존만 한다.

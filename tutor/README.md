@@ -4,7 +4,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-skill-blue)](https://docs.anthropic.com/en/docs/claude-code)
 [![Install with npx skills](https://img.shields.io/badge/npx_skills-add-green)](https://github.com/vercel-labs/skills)
 
-Five [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills that turn any document source into a **portable markdown StudyVault**, teach you through it step-by-step, quiz you on it, browse it in a polished local web viewer, and incrementally re-sync as your source materials evolve — closing the loop from content to comprehension. The vault is plain markdown, so it renders in any editor or viewer (GitHub, VS Code, mdBook, etc.) — no proprietary tools required.
+Six [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills that turn any document source into a **portable markdown StudyVault**, teach you through it step-by-step, quiz you on it, **rebirth (환생) mastered areas for ever-harder re-runs**, browse it in a polished local web viewer, and incrementally re-sync as your source materials evolve — closing the loop from content to comprehension. The vault is plain markdown, so it renders in any editor or viewer (GitHub, VS Code, mdBook, etc.) — no proprietary tools required.
 
 ## How It Works
 
@@ -30,6 +30,7 @@ Five [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills that t
 | **setup** | `/setup` | Build a source-fidelity StudyVault | Documents (PDF / MD / HTML / EPUB / TXT / URL) | Verbatim-quoted markdown notes, captured PDF page renders, dashboards |
 | **lesson** | `/lesson <note>` | Step-by-step concept tutor for one note | A concept note path | LLM-composed elaboration in chat; `[supplement]` Q&A sections persisted back into the note |
 | **quiz** | `/quiz` | Interactive quiz tutor | An existing StudyVault | 4-question rounds with concept-level progress tracking |
+| **rebirth** | `/rebirth` | Re-conquer a mastered area at higher difficulty | A 🟦 Mastered area | Challenge track reset + permanent ⭐×N honor badge; tier-scaled harder quizzes |
 | **view** | `/view` | Local web viewer | An existing StudyVault | Browser UI with search, Mermaid, code highlighting, dark mode |
 | **sync** | `/sync` | Incremental vault update from changed sources | Modified source files in CWD | Regenerated affected notes; learning progress preserved (error notes never deleted) |
 
@@ -44,7 +45,7 @@ From inside Claude Code:
 /plugin install tutor@custom-plugin
 ```
 
-This registers all five skills (`/setup`, `/lesson`, `/quiz`, `/view`, `/sync`) automatically.
+This registers all six skills (`/setup`, `/lesson`, `/quiz`, `/rebirth`, `/view`, `/sync`) automatically.
 
 ### Step 1: Generate a StudyVault
 
@@ -203,6 +204,41 @@ Error notes are permanent learning history — never deleted even after a concep
 
 ---
 
+## rebirth
+
+Take an area you've already pushed to **🟦 Mastered** and re-conquer it from scratch at higher difficulty — earning a permanent **⭐×N** honor badge each time. Rebirth is a separate, opt-in loop you trigger explicitly with `/rebirth`; it never fires automatically.
+
+### Dual-track model
+
+| Track | On rebirth | Shown as |
+|-------|-----------|----------|
+| **Honor** (permanent) | `prestige_tier += 1` | `⭐×N` next to the level badge |
+| **Challenge** (reset) | tracker emptied → area drops to ⬜ and is re-mastered | normal level badge climbing back to 🟦 |
+
+`### Error Notes`, the `## Prestige` history, and the concept seed block are **always preserved** — rebirth resets the challenge, not your learning history (spec: [`_shared/progress-rules.md` §8](skills/_shared/progress-rules.md)).
+
+### Difficulty by tier
+
+Each rebirth raises the difficulty of the generated questions (spec: [`skills/rebirth/references/rebirth-rules.md`](skills/rebirth/references/rebirth-rules.md)):
+
+| Tier | Hardness | Focus |
+|------|----------|-------|
+| 1 | hard 60% | Behavioral prediction & comparison; less rote recall |
+| 2 | hard 80% | Debugging scenarios & trade-offs; combine 2 concepts |
+| 3 | hard 100% | Scenario / design-judgment; integrate many concepts |
+| 4+ | hard 100% (soft cap) | Same ceiling, widened with adjacent-area integration |
+
+### Flow
+
+1. `/rebirth` lists your **🟦 Mastered** areas (each with its current ⭐ tier)
+2. Pick one → confirm the reset (it empties that area's tracker)
+3. The area resets to `⬜ ⭐×(N+1)` and is re-quizzed with tier-scaled harder questions
+4. Re-master it back to 🟦 — then rebirth again for the next tier
+
+CLI shortcut: `/rebirth <area>`.
+
+---
+
 ## view
 
 Opens a local, hot-reloading web viewer for your StudyVault. Built on Vite + React + Tailwind, designed with an editorial/library aesthetic (serif body, warm ink palette) rather than generic SaaS chrome.
@@ -305,7 +341,8 @@ Renders correctly on GitHub, VS Code (built-in preview), mdBook, Docusaurus, MkD
         │   Targeted practice          │───────────┘
         └──────────────────────────────┘
 
-  Source materials changed?  →  /sync  (rebuild only what changed; preserve progress)
+  Source materials changed?  →  /sync     (rebuild only what changed; preserve progress)
+  Area reached 🟦 Mastered?   →  /rebirth  (reset & re-conquer harder; earn ⭐×N)
 ```
 
 ## Requirements
@@ -321,10 +358,10 @@ Renders correctly on GitHub, VS Code (built-in preview), mdBook, Docusaurus, MkD
 ```
 tutor-skill/
 ├── skills/
-│   ├── _shared/                # Cross-skill specs (referenced by setup/quiz/lesson/sync)
+│   ├── _shared/                # Cross-skill specs (referenced by setup/quiz/lesson/sync/rebirth)
 │   │   ├── cwd-boundary.md
 │   │   ├── portability-rules.md
-│   │   └── progress-rules.md   # Spec of record for Coverage / Mastery / Streak
+│   │   └── progress-rules.md   # Spec of record for Coverage / Mastery / Streak / Prestige
 │   ├── setup/
 │   │   ├── SKILL.md
 │   │   └── references/
@@ -339,6 +376,10 @@ tutor-skill/
 │   │   └── references/
 │   │       ├── quiz-rules.md
 │   │       └── templates.md    # Fallback templates when quiz creates files on the fly
+│   ├── rebirth/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       └── rebirth-rules.md  # Tier difficulty curve for area rebirths
 │   ├── sync/
 │   │   ├── SKILL.md
 │   │   └── references/

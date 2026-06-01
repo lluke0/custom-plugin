@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom'
-import { vaultFiles, findDashboard, getVaultName, vaultTree, type VaultTreeNode } from '@/lib/vault-index'
+import { vaultFiles, findDashboard, getVaultName, vaultTree, getPrestige, type VaultTreeNode } from '@/lib/vault-index'
 
 export function HomePage() {
   const vaultName = getVaultName()
   const dashboard = findDashboard()
+  const prestige = getPrestige()
   const recent = vaultFiles.slice(0, 10)
 
   const topFolders = (vaultTree.children ?? []).filter((n) => n.type === 'folder')
@@ -97,9 +98,30 @@ export function HomePage() {
               style={{ color: 'var(--text-strong)' }}
             >
               <span>{dashboard.title}</span>
+              {prestige.maxTier > 0 && (
+                <span
+                  className="inline-flex items-center"
+                  title={`환생 — 최고 ⭐×${prestige.maxTier}, ${prestige.areas.length}개 영역`}
+                  style={{
+                    fontSize: 'var(--fs-small)',
+                    fontWeight: 600,
+                    color: 'var(--accent)',
+                    background: 'var(--bg-raised)',
+                    border: '1px solid var(--divider)',
+                    borderRadius: '4px',
+                    padding: '0 6px',
+                    height: '20px',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  ⭐×{prestige.maxTier}
+                </span>
+              )}
             </div>
             <div className="text-ui" style={{ color: 'var(--text-gray)' }}>
-              영역별 숙련도, 개념 해결 현황, 취약 영역을 한눈에 파악하세요.
+              {prestige.areas.length > 0
+                ? `영역별 숙련도와 취약 영역, 그리고 환생한 ${prestige.areas.length}개 영역(최고 ⭐×${prestige.maxTier})을 한눈에.`
+                : '영역별 숙련도, 개념 해결 현황, 취약 영역을 한눈에 파악하세요.'}
             </div>
           </div>
           <svg

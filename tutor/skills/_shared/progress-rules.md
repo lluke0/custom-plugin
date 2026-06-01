@@ -11,6 +11,14 @@ This is the **spec of record** for how learning progress is computed and stored.
 ```markdown
 # {Area Name} — Concept Tracker
 
+<!-- prestige_tier: 2 -->
+
+## Prestige (환생)
+
+- ⭐ Tier 1 정복: 2026-03-01
+- ⭐ Tier 2 정복: 2026-04-15
+- ▶ 현재: 3회차 도전 중 (started 2026-05-20)
+
 ## Concepts (N total)
 
 - concept name 1
@@ -38,6 +46,8 @@ This is the **spec of record** for how learning progress is computed and stored.
 | **Streak** | int ≥ 0 | **Consecutive** correct answers since last miss. Resets to 0 on wrong answer |
 | Last Tested | `YYYY-MM-DD` | Date of the most recent attempt |
 | Status | enum | 📘 / 🔴 / 🟡 / 🟢 (see §4) |
+
+**Prestige metadata (optional)**: The `<!-- prestige_tier: N -->` comment and `## Prestige (환생)` section appear **only after an area's first rebirth** (§8). At tier 0 (never rebirthed) both are absent and the file is byte-for-byte as before — full backward compatibility. `prestige_tier` is the single source of truth for the ⭐ count; the `## Prestige` bullets are a human-readable log. Neither participates in Coverage/Mastery/Level math — prestige is a display-and-history layer only.
 
 **Concepts seed block** (`## Concepts (N total)`):
 - Lists **all** concepts the area is expected to cover. Tested OR not.
@@ -81,7 +91,7 @@ If the `## Concepts (N total)` seed block is missing (older vault not yet migrat
 
 | Area | Concepts | Covered | Accuracy | Mastery | Level | Details |
 |------|----------|---------|----------|---------|-------|---------|
-| 확장성 기초 | 10 | 10/10 (100%) | 10/10 (100%) | 10/10 (100%) | 🟦 Mastered | [details](concepts/확장성 기초.md) |
+| 확장성 기초 | 10 | 10/10 (100%) | 10/10 (100%) | 10/10 (100%) | 🟦 Mastered ⭐×2 | [details](concepts/확장성 기초.md) |
 | DNS         | 4  | 1/4 (25%)    | 0/1 (0%)     | 0/4 (0%)     | ⬜ Undersampled | [details](concepts/DNS.md) |
 | **Total**   | **N** | **x/N**     | **a/b**      | **c/N**      | (overall level — see below) | |
 
@@ -108,7 +118,7 @@ If the `## Concepts (N total)` seed block is missing (older vault not yet migrat
 | Covered | `len(rows in tracker table) / Concepts` — how many have been encountered (lesson or quiz). Includes 📘 rows |
 | Accuracy | `count(Status=🟢) / count(Status ∈ {🔴,🟡,🟢})` — among **quiz-tested** rows only. 📘 rows are excluded from both numerator and denominator (not yet tested) |
 | Mastery | `count(Status=🟢) / max(Concepts, len(rows in tracker))` — primary skill indicator. 📘 rows count toward the tracker-length guard but never toward the numerator. Under the Option A seed-authoritative invariant (§1), `len(tracker) ≤ Concepts` so the `max()` collapses to `Concepts` |
-| Level | Derived from Coverage + Mastery + unresolved count per §3 |
+| Level | Derived from Coverage + Mastery + unresolved count per §3. Append ` ⭐×N` when `prestige_tier ≥ 1` (§8) — e.g. `🟦 Mastered ⭐×2`. The ⭐ suffix is display-only and never changes the underlying §3 level |
 
 Use "x/N (p%)" format for human readability. Display "-" for undefined ratios (e.g. `0/0`).
 
@@ -235,3 +245,43 @@ Emit one-time notice: "ℹ️ 스키마가 업데이트되었습니다. {N} conc
 
 - All dates stored as `YYYY-MM-DD` (ISO 8601 date only, no time component).
 - Today's date is provided by the conversation's injected `currentDate` context.
+
+---
+
+## 8. Prestige Track (환생)
+
+The **rebirth** skill (`/rebirth`) lets a learner re-conquer an already-mastered area at progressively higher difficulty. It layers a *prestige* track on top of the §3 level — a **dual-track** model:
+
+- **Honor track (permanent)**: `prestige_tier`, an integer ≥ 0 counting how many times the area has been reborn. Rendered as `⭐×N` beside the level badge. Only ever increases.
+- **Challenge track (reset on rebirth)**: the per-concept tracker table, which is **emptied** on each rebirth so the area must be re-mastered from scratch under harder questions.
+
+### 8.1 Eligibility
+
+An area is rebirth-eligible **iff its current Level is 🟦 Mastered** (§3). Areas at ⬜/🟥/🟨/🟩 are not eligible — master them with `/quiz` first.
+
+### 8.2 Rebirth action (performed by `/rebirth` Phase 3)
+
+When the user confirms a rebirth on area A (currently 🟦, tier = T):
+
+1. **Archive the run** — append a bullet to A's `## Prestige (환생)` section recording the just-completed conquest (`⭐ Tier {T+1} 정복: {today}`). Create the section + `<!-- prestige_tier -->` comment if this is the first rebirth.
+2. **Bump tier** — `prestige_tier = T + 1`. This is the new ⭐ count.
+3. **Reset the challenge track** — **empty the tracker table** (delete all rows). The `## Concepts (N total)` seed block is **kept unchanged**. `### Error Notes` are **kept** (permanent learning history — never deleted, per §4).
+4. **Recompute dashboard** — with an empty tracker, `Covered = 0/N` → Level = ⬜ Undersampled, so the Level cell becomes `⬜ Undersampled ⭐×{T+1}`. All §2/§3 math is unchanged; only the `⭐×N` suffix is appended.
+
+> Emptying the tracker is **not** an error-note or file deletion; it is a deliberate reset of the challenge track. `sync` MUST preserve the `## Prestige` section and `prestige_tier` (never strip them).
+
+### 8.3 Re-mastering and the ⭐ suffix
+
+After rebirth the learner answers harder questions (difficulty scaled by tier — see [`rebirth/references/rebirth-rules.md`](../rebirth/references/rebirth-rules.md)). Normal §4 transitions apply, so the area climbs ⬜ → 🟥 → … → 🟦 again. Throughout, the `⭐×N` suffix stays attached to whatever the current §3 level is:
+
+- Mid-climb: `🟨 Fair ⭐×2` (tier 2, currently re-mastering)
+- Re-conquered: `🟦 Mastered ⭐×2` (eligible to rebirth again → would become tier 3)
+
+`N` (= `prestige_tier`) is independent of the current level; it only ever increases, and only at the moment of a rebirth.
+
+### 8.4 Invariants
+
+- `prestige_tier ≥ 0`; absent comment ⇒ tier 0 (backward compatible — pre-rebirth vaults are unaffected).
+- The `⭐×N` suffix never alters the §3 level computation — strip it before parsing a level, append it after.
+- Coverage / Accuracy / Mastery formulas (§2) ignore prestige entirely.
+- The Total-row level (§2) ignores ⭐ — prestige is per-area only, never aggregated.

@@ -21,6 +21,7 @@ Detects changes in source materials since last build and incrementally updates t
 ```
 NEVER DELETE:
   - Error notes (오답 메모) — 학습 이력 전체 보존
+  - `## Prestige` 섹션 + `<!-- prestige_tier: N -->` — 환생 명예 이력 보존 (progress-rules §8)
   - concepts/**, dashboard.md, archive/** — 파일 삭제 금지 (archive 이동만)
 
 ALWAYS REQUIRE APPROVAL (AskUserQuestion):
@@ -161,8 +162,8 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 |--------|--------|----------|
 | 🆕 신규 area | `dashboard.md`에 새 행 추가 (`Concepts=<seed 수>`, 나머지=0, ⬜). `concepts/<new>.md` 생성, seed populate (**section-level: area 폴더 각 concept note의 `##` 섹션마다 1개 seed**, boilerplate 섹션 제외, label `<file-basename> · <section-title>`), tracker 비움. | Auto |
 | 🗑️ area 삭제 | `concepts/<area>.md` → `archive/concepts/<area>.md`. Dashboard 행에 `(archived)` + Details 링크 archive 경로로. | **Ask** |
-| ✏️ area rename | `concepts/<old>.md` → `concepts/<new>.md`. 내부 H1 + dashboard 행 이름/링크 갱신. **Tracker 행 (Streak 포함) · Error notes · seed block 전부 원본 보존.** | **Ask** (diff 제시) |
-| ✏️ area 병합 (A+B → C) | seed 병합·중복 제거. Attempts/Correct 합산. **Streak은 합산하지 않고 min(A,B)** (보수적). Error notes는 `**source area**` 부제로 모두 보존. | **Ask** (프리뷰) |
+| ✏️ area rename | `concepts/<old>.md` → `concepts/<new>.md`. 내부 H1 + dashboard 행 이름/링크 갱신. **Tracker 행 (Streak 포함) · Error notes · seed block · `## Prestige`/prestige_tier 전부 원본 보존.** | **Ask** (diff 제시) |
+| ✏️ area 병합 (A+B → C) | seed 병합·중복 제거. Attempts/Correct 합산. **Streak은 합산하지 않고 min(A,B)** (보수적). Error notes는 `**source area**` 부제로 모두 보존. **prestige_tier는 max(A,B) 보존** (가장 높은 환생 이력 유지). | **Ask** (프리뷰) |
 | ✏️ source 내용만 변경 | concepts 건드리지 않음. concept가 source에서 사라지면 Status 옆 `⚠️ stale` (content-stale 마커). | Auto (표시만) |
 | ✏️ 새 concept note 추가 | 노트 내 `##` 섹션(boilerplate 제외)마다 seed 1개씩 추가, tracker는 그대로. dashboard `Concepts +<섹션 수>`, Covered/Mastery 재계산. | Auto |
 | ✏️ concept note 내 `##` 섹션 추가/삭제 | 추가된 섹션 → seed 추가 (`Concepts +N`). 삭제된 섹션 → seed에서 제거; 해당 tracker 행은 유지 + Status 옆 `⚠️ stale` (`Concepts −N`). | Auto (표시만) |
@@ -182,7 +183,7 @@ Sync `dashboard.md` and `concepts/` per case table. Error notes are NEVER delete
 - `Covered` = tracker rows / Concepts
 - `Accuracy` = 🟢 count / tracker rows (denom 0 → `-`)
 - `Mastery` = 🟢 count / Concepts
-- `Level` = §3 임계값 (Coverage gate + Mastery tier)
+- `Level` = §3 임계값 (Coverage gate + Mastery tier); `prestige_tier ≥ 1`이면 Level 셀에 `⭐×N` suffix 보존 (§8)
 - Stats: Total Concepts, Covered, Mastered, Unresolved, Weakest/Strongest (⬜ 제외)
 
 **Archive 구조**:

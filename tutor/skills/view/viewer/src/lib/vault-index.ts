@@ -148,6 +148,37 @@ export function findDashboard(): VaultFile | undefined {
   return vaultFiles.find((f) => f.isDashboard)
 }
 
+export interface AreaPrestige {
+  area: string
+  tier: number
+}
+
+/**
+ * Parse the dashboard's Proficiency table for prestige tiers. Reads the `⭐×N`
+ * suffix that the rebirth skill appends to each area's Level cell (see
+ * progress-rules.md §8). Returns one entry per area reborn at least once.
+ */
+export function getPrestige(): { maxTier: number; areas: AreaPrestige[] } {
+  const dash = findDashboard()
+  if (!dash) return { maxTier: 0, areas: [] }
+  const areas: AreaPrestige[] = []
+  for (const line of dash.content.split('\n')) {
+    const star = line.match(/⭐\s*×\s*(\d+)/)
+    if (!star) continue
+    const filled = line
+      .split('|')
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0)
+    if (filled.length < 2) continue
+    const area = filled[0].replace(/\*\*/g, '')
+    if (/^total$/i.test(area)) continue
+    const tier = parseInt(star[1], 10)
+    if (tier >= 1) areas.push({ area, tier })
+  }
+  const maxTier = areas.reduce((m, a) => Math.max(m, a.tier), 0)
+  return { maxTier, areas }
+}
+
 export function getVaultName(): string {
   return 'StudyVault'
 }
