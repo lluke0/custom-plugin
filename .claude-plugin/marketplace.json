@@ -6,9 +6,17 @@
   },
   "metadata": {
     "description": "Custom Claude Code plugin marketplace",
-    "version": "0.6.3"
+    "version": "0.7.0"
   },
   "plugins": [
+    {
+      "name": "maltu",
+      "source": "./maltu",
+      "description": "한글 글을 원하는 말투(톤)로 자연스럽게 바꿔주는 변환기. 의미·사실·수치·고유명사는 그대로 두고 어미·문장 리듬·표현·포맷만 변경. ①자연스러움 복원 + ②톤 적용 2층 구조이며, 2023 이전 vs 2026 실제 글 데이터로 검증한 플랫폼-네이티브 프리셋(velog·브런치·링크드인)과 일반 말투(해요체·하십시오체·반말·SNS·다정·간결)를 제공. /maltu 명령 포함.",
+      "version": "0.1.0",
+      "category": "writing",
+      "tags": ["korean", "tone", "style", "rewriting", "maltu"]
+    },
     {
       "name": "tutor",
       "source": "./tutor",
