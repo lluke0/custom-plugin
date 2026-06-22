@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Custom Claude Code plugin marketplace",
-    "version": "0.7.0"
+    "version": "0.7.1"
   },
   "plugins": [
     {
@@ -21,7 +21,7 @@
       "name": "tutor",
       "source": "./tutor",
       "description": "Turn documents into a portable markdown StudyVault, learn step-by-step, quiz yourself at the concept level, and rebirth (환생) mastered areas for ever-harder re-runs. Bundles /setup, /lesson, /quiz, /rebirth, /view, /sync.",
-      "version": "0.11.0",
+      "version": "0.11.1",
       "category": "learning",
       "tags": ["study", "markdown", "lesson", "quiz", "active-recall", "viewer", "rebirth", "prestige"]
     },

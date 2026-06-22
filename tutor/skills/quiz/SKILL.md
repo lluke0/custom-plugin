@@ -99,7 +99,7 @@ Then on the loaded scope:
    - **Choose a section / Hard-mode**: sample broadly from chosen area.
 3. Craft exactly 4 questions following [quiz-rules.md](references/quiz-rules.md).
 
-**CRITICAL**: Read `references/quiz-rules.md` before crafting ANY question. Zero hints allowed.
+**CRITICAL**: Read `references/quiz-rules.md` before crafting ANY question. Zero hints — but hiding the answer ≠ stripping context: each stem must lay out enough situation/premises/criteria that someone who knows the concept can tell what is being asked.
 
 ### Phase 4: Present Quiz
 
@@ -170,7 +170,7 @@ Dashboard / Concept file / Tracker row / Error note formats: see [references/tem
 ## Important Reminders
 
 - ALWAYS read [progress-rules.md](../_shared/progress-rules.md) before Phase 2.5 / Phase 6 (spec of record).
-- ALWAYS read [quiz-rules.md](references/quiz-rules.md) before creating questions. Zero hints.
+- ALWAYS read [quiz-rules.md](references/quiz-rules.md) before creating questions. Zero hints, but provide sufficient context (situation/premises/criteria) — see quiz-rules.md §Provide Sufficient Context.
 - Error notes are NEVER deleted — permanent learning history.
 - All cross-file links use relative-path markdown, never wiki-links.
 - **"Mastered/마스터" 어휘 사용 규칙**: 사용자에게 보여주는 자유 텍스트(축하 멘트, 요약 문장 등)에서 "Mastered", "마스터", "정복" 같은 표현은 **해당 영역의 Level이 §3 기준 🟦 Mastered일 때만** 사용한다. 그 외에는 "정답률 향상", "이번 세션에서 N개 개선", "🟡로 승급", "🔴 N개 남음" 처럼 사실 기반 표현을 쓴다. 한 문제만 맞아도 Status가 🟢이 되었다는 이유로 area를 "마스터"라고 부르지 않는다.

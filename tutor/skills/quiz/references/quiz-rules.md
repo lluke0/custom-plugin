@@ -18,6 +18,19 @@ Every question must be answerable ONLY by someone who actually knows the materia
 
 5. **Plausible distractors**: Wrong options must be real concepts from the domain, representing common misconceptions
 
+## Provide Sufficient Context (맥락 충분성)
+
+Counterweight to Zero-Hint: hiding the answer is NOT the same as stripping context. The goal is discrimination — "those who know it solve it, those who don't can't" — not brevity. A stem that omits the setup produces noise errors (people who know the concept fail because the sentence is underspecified), not real signal.
+
+1. **Context ≠ hint**: Stating the situation, premises, and criteria the question is measured against is NOT a Zero-Hint violation. Only revealing *which option is correct* is.
+
+2. **State the frame for relational questions**: For comparison / direction / ordering / relative-magnitude questions, name the reference frame (the two ends of the axis, the baseline being compared) in the stem. Mirror-image option pairs ("A up · B down" vs "A down · B up") that can't be solved without an unstated frame are forbidden.
+
+3. **Check question**: "From this stem alone, can a learner who knows the concept tell exactly what is being asked?" If not, add more context.
+
+- BAD: "Which of the following is correct?" + [near-context-free one-line options]
+- GOOD: "<1–2 sentences laying out situation · premises · criteria>, which is correct?" + [...]
+
 ## Question Types
 
 1. **Factual recall**: "What HTTP status code is returned when...?"
